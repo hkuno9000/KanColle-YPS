@@ -18,6 +18,7 @@ var $quest_count = 0;
 var $quest_list = {};
 var $battle_count = 0;
 var $ndock_list = {};
+var $enemy_id = null;
 
 //-------------------------------------------------------------------------
 // Ship クラス.
@@ -553,11 +554,13 @@ function on_next_cell(json) {
 	$next_mapinfo = $mst_mapinfo[d.api_maparea_id * 10 + d.api_mapinfo_no];
 	if (e) {
 		var msg = e.api_enemy_id.toString(10);
+		var fleet = load_enemy_fleet(msg);
 		if (d.api_event_id == 5) {
 			msg += '(boss)';
 			$is_boss = true;
 		}
 		$next_enemy = area + ': ' + msg;
+		msg += fleet ? ('\n' + fleet) : ' first encounter'; // $next_enemy には引き継がない
 		chrome.extension.sendRequest('## next enemy\n' + area + ': ' + msg);
 	}
 	if (g) {
@@ -711,13 +714,30 @@ function on_battle(json) {
 		push_fdeck_status(req, $fdeck_list[2], maxhps_c, nowhps_c); // 連合第二艦隊は二番固定です.
 	}
 	req.push('## enemy damage');
+	var enemy_fleet = '';
 	for (var i = 1; i <= 6; ++i) {
 		var ke = d.api_ship_ke[i];
 		if (ke == -1) continue;
 		var name = ship_name(ke) + 'Lv' + d.api_ship_lv[i];
 		req.push('\t' + i + '(' + name + ').\t' + hp_status(nowhps[i+6], maxhps[i+6]));
+		enemy_fleet += '\t' + i + '(' + name + ')';
+	}
+	if($enemy_id) { // 演習は$enemy_idが空
+		save_enemy_fleet(enemy_fleet);
 	}
 	chrome.extension.sendRequest(req);
+}
+
+function load_enemy_fleet(e_id){
+	$enemy_id = e_id;
+	var e = load_storage('enemy');
+	return e[e_id];
+}
+
+function save_enemy_fleet(enemy_fleet){
+	var e = load_storage('enemy');
+	e[$enemy_id] = enemy_fleet;
+	save_storage('enemy', e);
 }
 
 chrome.devtools.network.onRequestFinished.addListener(function (request) {
@@ -900,6 +920,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 演習相手の提督名を記憶する.
 			$next_enemy = "演習相手:" + json.api_data.api_nickname;
 			$next_mapinfo = { api_name : "演習" };
+			$enemy_id = null;
 		};
 	}
 	else if (api_name == '/api_req_map/start') {
