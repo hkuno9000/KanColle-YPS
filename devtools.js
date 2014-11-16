@@ -14,6 +14,7 @@ var $fdeck_list = {};
 var $next_mapinfo = null;
 var $next_enemy = null;
 var $is_boss = false;
+var $is_water = false;
 var $material = {};
 var $quest_count = 0;
 var $quest_exec_count = 0;
