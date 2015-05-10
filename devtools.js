@@ -994,6 +994,12 @@ function on_next_cell(json) {
 		if (d.api_event_id == 5) {
 			area += '(boss)';
 			$is_boss = true;
+			// 1-6 対策：戦闘のないボスマス.
+			var w = get_weekly();
+			if(w.quest_state == 2) {
+				w.boss_cell++;
+				save_weekly();
+			}
 		}
 		$next_enemy = area + ':' + $enemy_id;
 		if (fleet) {
@@ -1655,7 +1661,6 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			if (w.quest_state != 2) return; // 遂行中以外は更新しない.
 			if (r == 'S') w.win_S++;
 			if($is_boss) {
-				w.boss_cell++;
 				if (r == 'S' || r == 'A' || r == 'B') w.win_boss++;
 			}
 			save_weekly();
