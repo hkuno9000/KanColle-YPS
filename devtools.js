@@ -1511,7 +1511,10 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 任務一覧.
 		func = function(json) { // 任務総数と任務リストを記録する.
 			var list = json.api_data.api_list;
-			if (!list) return;
+			if (!list) {
+				on_port(json);
+				return;
+			}
 			$quest_count = json.api_data.api_count;
 			$quest_exec_count = json.api_data.api_exec_count;
 			if (json.api_data.api_disp_page == 1 && $quest_count != Object.keys($quest_list).length) {
