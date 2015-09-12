@@ -5,7 +5,7 @@
     <title>KanColle-YPS by hkuno9000</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
@@ -36,6 +36,7 @@
 <li>艦これの画面から目を離していても、ゲーム進行状況をすべて把握することが目的です。</li>
 <li>遠征終了時刻や任務遂行状況を記録し、メモがわりに使えるようにします。</li>
 <li>各艦毎の攻撃種別・使用装備・与ダメージを戦闘詳報として記録し、攻撃力検証に使えるようにします。</li>
+<li>キラ付け、近代化改修、装備改修、熟練度など、ロックした艦と装備の全内容を一覧表示します。</li>
 </ul>
 
 <h2>
@@ -46,8 +47,15 @@
 <ol>
 <li>ソースコード一式のZIPファイルをダウンロードし、適当なフォルダへ展開する</li>
 <li>Google Chromeの拡張機能設定ページを開く(右肩の三本線→設定→左列の拡張機能)</li>
-<li>[デベロッパー モード]にチェックを入れる</li>
-<li>[パッケージ化されていない拡張機能を読み込む]ボタンを押して、ダウンロードしたソースコード一式が含まれるフォルダを指定する(これで拡張機能がインストールされる)</li>
+<li>【デベロッパー モード】にチェックを入れる</li>
+<li>【パッケージ化されていない拡張機能を読み込む】ボタンを押して、ダウンロードしたソースコード一式が含まれるフォルダを指定する(これで拡張機能がインストールされる)</li>
+</ol>
+
+<h2>
+<a id="バージョンアップ方法" class="anchor" href="#%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%82%A2%E3%83%83%E3%83%97%E6%96%B9%E6%B3%95" aria-hidden="true"><span class="octicon octicon-link"></span></a>バージョンアップ方法</h2>
+
+<ol>
+<li>前回インストールしたフォルダへZIPファイルの中身を上書きして、Chromeを再起動する.</li>
 </ol>
 
 <h2>
@@ -60,7 +68,7 @@
 <li><strong>「キャンセル」ではなく「無効にする」を選ぶと、このプラグインが無効化されてしまいます。</strong></li>
 </ul>
 </li>
-<li>Google Chromeの[デベロッパー ツール]を起動する(右肩の三本線→その他のツール→デベロッパーツール)
+<li>Google Chromeの【デベロッパー ツール】を起動する(右肩の三本線→その他のツール→デベロッパーツール)
 
 <ul>
 <li><strong>デベロッパーツールを起動させておかないと動作しません</strong></li>
@@ -69,14 +77,15 @@
 </li>
 <li>Google Chromeで艦これにログインすると、画面右側に「艦これ余所見プレイ支援」と表示されます。</li>
 <li>母港画面では、画面右側に「資材増減数、艦娘保有数、装備保有数、改造/近代化改修可能艦数、キラ付艦数、修理中、建造中、任務遂行数、艦隊１～４」の各メニューが表示されます。</li>
-<li>メニューの[+]ボタンをクリックすると詳細が表示されます。</li>
+<li>メニューの + ボタンをクリックすると詳細が表示されます。</li>
 <li>艦隊１～４の Cond 値は49が平常で50以上がキラキラです。53以上が二重キラ、85以上が三重キラです。</li>
 <li>あ号任務についてはその内訳（出撃数、ボス勝利、ボス到達、S勝利）を表示します。</li>
 <li>ドラム缶装備の待機艦（遠征交代要員）をCond値別に一覧表示します。</li>
 <li>羅針盤画面では次戦闘マスにて過去に遭遇した敵編成の一覧を表示します。</li>
 <li>戦闘画面では、画面右側に敵味方艦隊のダメージ(撃沈、大破、中破、小破)と戦果を表示し、大破進撃を警告します。</li>
 <li>遠征、演習、入渠時には任務受諾状況を表示し、任務チェック漏れを警告します。</li>
-<li>遠征結果、道中資源、任務達成、入渠、工廠による資材増減を記録して表示します。</li>
+<li>遠征結果、道中資源、任務達成、入渠、工廠による資材増減を記録して表示します。週間収支(月曜5:00AM以降の増減)と今回収支(ログイン以降の増減)も表示します。</li>
+<li>gooleアカウントの同期機能を利用して、週間収支とあ号任務の進捗内訳をPC間で同期します。(右肩の三本線→設定→ログイン同期の詳細設定　にてアプリと拡張機能にチェックを入れる)</li>
 <li>画面最上部の「全閉」ボタンはメニューをすべて閉じます。</li>
 <li>画面最上部の「←」「→」ボタンは表示内容を履歴参照します。</li>
 </ol>
@@ -92,9 +101,19 @@
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-battle.png" alt="battle screenshot"></p>
 
 <h3>
+<a id="戦闘詳報サンプル" class="anchor" href="#%E6%88%A6%E9%97%98%E8%A9%B3%E5%A0%B1%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>戦闘詳報サンプル</h3>
+
+<p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-battle-detail.png" alt="battle screenshot"></p>
+
+<h3>
 <a id="帰港画面サンプル" class="anchor" href="#%E5%B8%B0%E6%B8%AF%E7%94%BB%E9%9D%A2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>帰港画面サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-ret.png" alt="battle screenshot"></p>
+
+<h3>
+<a id="資材収支表サンプル" class="anchor" href="#%E8%B3%87%E6%9D%90%E5%8F%8E%E6%94%AF%E8%A1%A8%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>資材収支表サンプル</h3>
+
+<p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-supply.png" alt="battle screenshot"></p>
 
 <h3>
 <a id="ロック艦一覧cond降順サンプル" class="anchor" href="#%E3%83%AD%E3%83%83%E3%82%AF%E8%89%A6%E4%B8%80%E8%A6%A7cond%E9%99%8D%E9%A0%86%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>ロック艦一覧（cond降順)サンプル</h3>
@@ -179,4 +198,3 @@
   
   </body>
 </html>
-
