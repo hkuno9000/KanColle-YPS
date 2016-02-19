@@ -20,18 +20,20 @@
 
     <section class="main-content">
       <h1>
-<a id="艦これ余所見プレイ支援-kancolleyps" class="anchor" href="#%E8%89%A6%E3%81%93%E3%82%8C%E4%BD%99%E6%89%80%E8%A6%8B%E3%83%97%E3%83%AC%E3%82%A4%E6%94%AF%E6%8F%B4-kancolleyps" aria-hidden="true"><span class="octicon octicon-link"></span></a>艦これ余所見プレイ支援 KanColleYPS</h1>
+<a id="艦これ余所見プレイ支援-kancolleyps" class="anchor" href="#%E8%89%A6%E3%81%93%E3%82%8C%E4%BD%99%E6%89%80%E8%A6%8B%E3%83%97%E3%83%AC%E3%82%A4%E6%94%AF%E6%8F%B4-kancolleyps" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>艦これ余所見プレイ支援 KanColleYPS</h1>
 
 <ul>
-<li>v1.0 Dec.2015</li>
+<li>v1.1 Feb.2016: 2016冬イベント空襲戦マス対応</li>
 <li>開発サイト: <a href="https://github.com/hkuno9000/KanColle-YPS">https://github.com/hkuno9000/KanColle-YPS</a>
 </li>
 <li>公開サイト: <a href="http://hkuno9000.github.io/KanColle-YPS">http://hkuno9000.github.io/KanColle-YPS</a>
 </li>
+<li>リリース履歴: <a href="https://github.com/hkuno9000/KanColle-YPS/releases">https://github.com/hkuno9000/KanColle-YPS/releases</a>
+</li>
 </ul>
 
 <h2>
-<a id="開発コンセプト" class="anchor" href="#%E9%96%8B%E7%99%BA%E3%82%B3%E3%83%B3%E3%82%BB%E3%83%97%E3%83%88" aria-hidden="true"><span class="octicon octicon-link"></span></a>開発コンセプト</h2>
+<a id="開発コンセプト" class="anchor" href="#%E9%96%8B%E7%99%BA%E3%82%B3%E3%83%B3%E3%82%BB%E3%83%97%E3%83%88" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>開発コンセプト</h2>
 
 <ul>
 <li>艦これの画面から目を離していても、ゲーム進行状況をすべて把握することが目的です。</li>
@@ -42,26 +44,28 @@
 </ul>
 
 <h2>
-<a id="インストール方法" class="anchor" href="#%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%96%B9%E6%B3%95" aria-hidden="true"><span class="octicon octicon-link"></span></a>インストール方法</h2>
+<a id="インストール方法" class="anchor" href="#%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E6%96%B9%E6%B3%95" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>インストール方法</h2>
 
 <p>Flash PlayerはChrome内蔵のほうを使用してください</p>
 
 <ol>
 <li>ソースコード一式のZIPファイルをダウンロードし、適当なフォルダへ展開する</li>
+<li>または git clone <a href="https://github.com/hkuno9000/KanColle-YPS.git%E3%80%80%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80%E3%81%B8%E5%B1%95%E9%96%8B%E3%81%99%E3%82%8B">https://github.com/hkuno9000/KanColle-YPS.git　でフォルダへ展開する</a>
+</li>
 <li>Google Chromeの拡張機能設定ページを開く(右肩の三本線→設定→左列の拡張機能)</li>
 <li>【デベロッパー モード】にチェックを入れる</li>
-<li>【パッケージ化されていない拡張機能を読み込む】ボタンを押して、ダウンロードしたソースコード一式が含まれるフォルダを指定する(これで拡張機能がインストールされる)</li>
+<li>【パッケージ化されていない拡張機能を読み込む】ボタンを押して、ソース展開したフォルダを指定する(これで拡張機能がインストールされる)</li>
 </ol>
 
 <h2>
-<a id="バージョンアップ方法" class="anchor" href="#%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%82%A2%E3%83%83%E3%83%97%E6%96%B9%E6%B3%95" aria-hidden="true"><span class="octicon octicon-link"></span></a>バージョンアップ方法</h2>
+<a id="バージョンアップ方法" class="anchor" href="#%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%82%A2%E3%83%83%E3%83%97%E6%96%B9%E6%B3%95" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>バージョンアップ方法</h2>
 
 <ol>
-<li>前回インストールしたフォルダへZIPファイルの中身を上書きして、Chromeを再起動する.</li>
+<li>ソース展開フォルダへZIPファイルの中身を上書き(または git pull)して、Chromeを再起動する.</li>
 </ol>
 
 <h2>
-<a id="使い方" class="anchor" href="#%E4%BD%BF%E3%81%84%E6%96%B9" aria-hidden="true"><span class="octicon octicon-link"></span></a>使い方</h2>
+<a id="使い方" class="anchor" href="#%E4%BD%BF%E3%81%84%E6%96%B9" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>使い方</h2>
 
 <ol>
 <li>Google Chrome起動時に「デベロッパーモードの拡張機能を無効にする」とのメッセージボックスを「キャンセル」する.
@@ -93,82 +97,82 @@
 </ol>
 
 <h3>
-<a id="母港画面サンプル" class="anchor" href="#%E6%AF%8D%E6%B8%AF%E7%94%BB%E9%9D%A2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>母港画面サンプル</h3>
+<a id="母港画面サンプル" class="anchor" href="#%E6%AF%8D%E6%B8%AF%E7%94%BB%E9%9D%A2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>母港画面サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-port.png" alt="port screenshot"></p>
 
 <h3>
-<a id="戦況画面サンプル" class="anchor" href="#%E6%88%A6%E6%B3%81%E7%94%BB%E9%9D%A2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>戦況画面サンプル</h3>
+<a id="戦況画面サンプル" class="anchor" href="#%E6%88%A6%E6%B3%81%E7%94%BB%E9%9D%A2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>戦況画面サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-battle.png" alt="battle screenshot"></p>
 
 <h3>
-<a id="戦闘詳報サンプル" class="anchor" href="#%E6%88%A6%E9%97%98%E8%A9%B3%E5%A0%B1%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>戦闘詳報サンプル</h3>
+<a id="戦闘詳報サンプル" class="anchor" href="#%E6%88%A6%E9%97%98%E8%A9%B3%E5%A0%B1%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>戦闘詳報サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-battle-detail.png" alt="battle screenshot"></p>
 
 <h3>
-<a id="羅針盤画面の大破進撃警告サンプル" class="anchor" href="#%E7%BE%85%E9%87%9D%E7%9B%A4%E7%94%BB%E9%9D%A2%E3%81%AE%E5%A4%A7%E7%A0%B4%E9%80%B2%E6%92%83%E8%AD%A6%E5%91%8A%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>羅針盤画面の大破進撃警告サンプル</h3>
+<a id="羅針盤画面の大破進撃警告サンプル" class="anchor" href="#%E7%BE%85%E9%87%9D%E7%9B%A4%E7%94%BB%E9%9D%A2%E3%81%AE%E5%A4%A7%E7%A0%B4%E9%80%B2%E6%92%83%E8%AD%A6%E5%91%8A%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>羅針盤画面の大破進撃警告サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-next-damage-alert.png" alt="battle screenshot"></p>
 
 <h3>
-<a id="帰港画面サンプル" class="anchor" href="#%E5%B8%B0%E6%B8%AF%E7%94%BB%E9%9D%A2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>帰港画面サンプル</h3>
+<a id="帰港画面サンプル" class="anchor" href="#%E5%B8%B0%E6%B8%AF%E7%94%BB%E9%9D%A2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>帰港画面サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-ret.png" alt="battle screenshot"></p>
 
 <h3>
-<a id="資材収支表サンプル" class="anchor" href="#%E8%B3%87%E6%9D%90%E5%8F%8E%E6%94%AF%E8%A1%A8%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>資材収支表サンプル</h3>
+<a id="資材収支表サンプル" class="anchor" href="#%E8%B3%87%E6%9D%90%E5%8F%8E%E6%94%AF%E8%A1%A8%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>資材収支表サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-supply.png" alt="battle screenshot"></p>
 
 <h3>
-<a id="ロック艦一覧cond降順サンプル" class="anchor" href="#%E3%83%AD%E3%83%83%E3%82%AF%E8%89%A6%E4%B8%80%E8%A6%A7cond%E9%99%8D%E9%A0%86%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>ロック艦一覧（cond降順)サンプル</h3>
+<a id="ロック艦一覧cond降順サンプル" class="anchor" href="#%E3%83%AD%E3%83%83%E3%82%AF%E8%89%A6%E4%B8%80%E8%A6%A7cond%E9%99%8D%E9%A0%86%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ロック艦一覧（cond降順)サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-cond-list.png" alt="locked ship screenshot"></p>
 
 <h3>
-<a id="ロック装備一覧改修中とレベル数付サンプル" class="anchor" href="#%E3%83%AD%E3%83%83%E3%82%AF%E8%A3%85%E5%82%99%E4%B8%80%E8%A6%A7%E6%94%B9%E4%BF%AE%E4%B8%AD%E3%81%A8%E3%83%AC%E3%83%99%E3%83%AB%E6%95%B0%E4%BB%98%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>ロック装備一覧（改修中★とレベル数付)サンプル</h3>
+<a id="ロック装備一覧改修中とレベル数付サンプル" class="anchor" href="#%E3%83%AD%E3%83%83%E3%82%AF%E8%A3%85%E5%82%99%E4%B8%80%E8%A6%A7%E6%94%B9%E4%BF%AE%E4%B8%AD%E3%81%A8%E3%83%AC%E3%83%99%E3%83%AB%E6%95%B0%E4%BB%98%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ロック装備一覧（改修中★とレベル数付)サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-slotitem-list.png" alt="locked slotitem screenshot"></p>
 
 <h3>
-<a id="改造近代化改修可能艦一覧サンプル" class="anchor" href="#%E6%94%B9%E9%80%A0%E8%BF%91%E4%BB%A3%E5%8C%96%E6%94%B9%E4%BF%AE%E5%8F%AF%E8%83%BD%E8%89%A6%E4%B8%80%E8%A6%A7%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>改造、近代化改修可能艦一覧サンプル</h3>
+<a id="改造近代化改修可能艦一覧サンプル" class="anchor" href="#%E6%94%B9%E9%80%A0%E8%BF%91%E4%BB%A3%E5%8C%96%E6%94%B9%E4%BF%AE%E5%8F%AF%E8%83%BD%E8%89%A6%E4%B8%80%E8%A6%A7%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>改造、近代化改修可能艦一覧サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-kaizou-list.png" alt="kaizou screenshot"></p>
 
 <h3>
-<a id="修理中入渠要修理艦一覧サンプル" class="anchor" href="#%E4%BF%AE%E7%90%86%E4%B8%AD%E5%85%A5%E6%B8%A0%E8%A6%81%E4%BF%AE%E7%90%86%E8%89%A6%E4%B8%80%E8%A6%A7%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>修理中(入渠)、要修理艦一覧サンプル</h3>
+<a id="修理中入渠要修理艦一覧サンプル" class="anchor" href="#%E4%BF%AE%E7%90%86%E4%B8%AD%E5%85%A5%E6%B8%A0%E8%A6%81%E4%BF%AE%E7%90%86%E8%89%A6%E4%B8%80%E8%A6%A7%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>修理中(入渠)、要修理艦一覧サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-repair-list.png" alt="kaizou screenshot"></p>
 
 <h3>
-<a id="未ロック未保有ダブリ艦一覧サンプル" class="anchor" href="#%E6%9C%AA%E3%83%AD%E3%83%83%E3%82%AF%E6%9C%AA%E4%BF%9D%E6%9C%89%E3%83%80%E3%83%96%E3%83%AA%E8%89%A6%E4%B8%80%E8%A6%A7%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>未ロック、未保有、ダブリ艦一覧サンプル</h3>
+<a id="未ロック未保有ダブリ艦一覧サンプル" class="anchor" href="#%E6%9C%AA%E3%83%AD%E3%83%83%E3%82%AF%E6%9C%AA%E4%BF%9D%E6%9C%89%E3%83%80%E3%83%96%E3%83%AA%E8%89%A6%E4%B8%80%E8%A6%A7%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>未ロック、未保有、ダブリ艦一覧サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-unlock-unown-double.png" alt="unlock unown double screenshot"></p>
 
 <h3>
-<a id="次戦闘マス敵遭遇回数記録サンプル" class="anchor" href="#%E6%AC%A1%E6%88%A6%E9%97%98%E3%83%9E%E3%82%B9%E6%95%B5%E9%81%AD%E9%81%87%E5%9B%9E%E6%95%B0%E8%A8%98%E9%8C%B2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>次戦闘マス敵遭遇回数記録サンプル</h3>
+<a id="次戦闘マス敵遭遇回数記録サンプル" class="anchor" href="#%E6%AC%A1%E6%88%A6%E9%97%98%E3%83%9E%E3%82%B9%E6%95%B5%E9%81%AD%E9%81%87%E5%9B%9E%E6%95%B0%E8%A8%98%E9%8C%B2%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>次戦闘マス敵遭遇回数記録サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-next-enemy-count.png" alt="next enemy count screenshot"></p>
 
 <h3>
-<a id="遠征交代要員一覧サンプル" class="anchor" href="#%E9%81%A0%E5%BE%81%E4%BA%A4%E4%BB%A3%E8%A6%81%E5%93%A1%E4%B8%80%E8%A6%A7%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>遠征交代要員一覧サンプル</h3>
+<a id="遠征交代要員一覧サンプル" class="anchor" href="#%E9%81%A0%E5%BE%81%E4%BA%A4%E4%BB%A3%E8%A6%81%E5%93%A1%E4%B8%80%E8%A6%A7%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>遠征交代要員一覧サンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-kira-standby.png" alt="kira standby screenshot"></p>
 
 <h3>
-<a id="演習任務チェックサンプル" class="anchor" href="#%E6%BC%94%E7%BF%92%E4%BB%BB%E5%8B%99%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>演習任務チェックサンプル</h3>
+<a id="演習任務チェックサンプル" class="anchor" href="#%E6%BC%94%E7%BF%92%E4%BB%BB%E5%8B%99%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>演習任務チェックサンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-practice-quest-check.png" alt="practice quest check screenshot"></p>
 
 <h3>
-<a id="遠征任務チェックサンプル" class="anchor" href="#%E9%81%A0%E5%BE%81%E4%BB%BB%E5%8B%99%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>遠征任務チェックサンプル</h3>
+<a id="遠征任務チェックサンプル" class="anchor" href="#%E9%81%A0%E5%BE%81%E4%BB%BB%E5%8B%99%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>遠征任務チェックサンプル</h3>
 
 <p><img src="http://hkuno9000.github.io/KanColle-YPS/images/YPS-mission-quest-check.png" alt="practice quest check screenshot"></p>
 
 <h2>
-<a id="注意事項" class="anchor" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85" aria-hidden="true"><span class="octicon octicon-link"></span></a>注意事項</h2>
+<a id="注意事項" class="anchor" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>注意事項</h2>
 
 <ul>
 <li>大破進撃は自己責任でお願いします。</li>
@@ -176,14 +180,14 @@
 </ul>
 
 <h2>
-<a id="仕組みなど" class="anchor" href="#%E4%BB%95%E7%B5%84%E3%81%BF%E3%81%AA%E3%81%A9" aria-hidden="true"><span class="octicon octicon-link"></span></a>仕組みなど</h2>
+<a id="仕組みなど" class="anchor" href="#%E4%BB%95%E7%B5%84%E3%81%BF%E3%81%AA%E3%81%A9" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>仕組みなど</h2>
 
 <p>元々Google Chromeにあるネットワークをモニタリングする機能を使って、サーバから送られてくる各種情報を拾って、ゲーム画面の右端にテキスト表示します。
 完全にパッシブ動作で、ゲームサーバへのリクエスト送信はしません。自動実行機能もありません。
 仕組み上、ゲーム画面の演出進行と、こちらの表示更新のタイミングが合いません。先に結果が見えてしまいますがご容赦ください。</p>
 
 <h2>
-<a id="参考プロジェクト" class="anchor" href="#%E5%8F%82%E8%80%83%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88" aria-hidden="true"><span class="octicon octicon-link"></span></a>参考プロジェクト</h2>
+<a id="参考プロジェクト" class="anchor" href="#%E5%8F%82%E8%80%83%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>参考プロジェクト</h2>
 
 <p>下記を元にして自分が欲しい機能を付け足しました。</p>
 
