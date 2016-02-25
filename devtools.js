@@ -1107,7 +1107,7 @@ function print_port() {
 	var ships = Object.keys($ship_list).length;
 	var space = $max_ship - ships;
 	if (space <= 0)      req.push('### @!!艦娘保有数が満杯です!!@'); // 警告表示.
-	else if (space <= 5) req.push('### @!!艦娘保有数の上限まで残り' + space + '!!@'); // 警告表示. 
+	else if (space <= 5) req.push('### @!!艦娘保有数の上限まで残り' + space + '!!@'); // 警告表示.
 	if (unlock_lv10) req.push('### @!!Lv10以上の未ロック艦があります!!@'); // 警告表示.
 	req.push('艦娘保有数:' + ships + '/' + $max_ship
 		+ '(未ロック:' + unlock_names.length
@@ -1138,8 +1138,8 @@ function print_port() {
 	// 装備数、ロック装備一覧を表示する.
 	var items = Object.keys($slotitem_list).length;
 	var space = $max_slotitem - items;
-	if (space <= 0)       req.push('### @!!装備保有数が満杯です!!@'); // 警告表示. 
-	else if (space <= 20) req.push('### @!!装備保有数の上限まで残り' + space + '!!@'); // 警告表示. 
+	if (space <= 0)       req.push('### @!!装備保有数が満杯です!!@'); // 警告表示.
+	else if (space <= 20) req.push('### @!!装備保有数の上限まで残り' + space + '!!@'); // 警告表示.
 	req.push('装備保有数:' + items + '/' + $max_slotitem
 		+ '(未ロック:' + (items - lockeditem_count)
 		+ ', ロック:' + lockeditem_count
