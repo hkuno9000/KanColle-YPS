@@ -1396,8 +1396,9 @@ function push_all_fleets(req) {
 		if (mission_end > 0) {
 			var d = new Date(mission_end);
 			var ms = d.getTime() - $pcDateTime.getTime();
+			var rest = ms > 0 ? '残' + msec_name(ms) : '終了';
 			var id = deck.api_mission[1];
-			req.push('遠征' + id + ' ' + $mst_mission[id].api_name + ': ' + d.toLocaleString() + '(残' + msec_name(ms) +  ')');
+			req.push('遠征' + id + ' ' + $mst_mission[id].api_name + ': ' + d.toLocaleString() + '(' + rest + ')');
 			$last_mission[f_id] = '前回遠征: ' + $mst_mission[id].api_name; // 支援遠征では /api_req_mission/result が来ないので、ここで事前更新しておく.
 		}
 		else if (deck.api_id == $battle_deck_id) {
