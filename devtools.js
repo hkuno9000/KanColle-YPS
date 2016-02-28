@@ -2074,7 +2074,24 @@ function on_battle(json, battle_api_name) {
 		if (ke == -1) continue;
 		var name = ship_name(ke) + 'Lv' + d.api_ship_lv[i];
 		$enemy_ship_names.push(name);
-		req.push('\t' + i + '(' + name + ').\t' + hp_status_on_battle(nowhps[i+6], maxhps[i+6], beginhps[i+6]));
+		req.push('\t' + i + '(' + name + ').\t' + hp_status_on_battle(nowhps[i+6], maxhps[i+6], beginhps[i+6]) + '\t');
+
+		var msg = ['YPS_enemy_detail' + i];
+		var enemy_slot = d.api_eSlot[i-1];
+		var param_name = ['火力', '雷装', '対空', '装甲'];
+		var enemy_param = d.api_eParam[i-1];
+		var enemy_kyouka = d.api_eKyouka[i-1];
+		var param = [];
+		for(var j = 0; j < 4; ++j){
+			param[j] = param_name[j] + ' ' + enemy_param[j] + (enemy_kyouka[j] ? ('(+' + enemy_kyouka[j] + ')') : '');
+		}
+		msg.push('* ' + param.join(', '));
+		for(var j = 0; j < enemy_slot.length; ++j){
+			if(enemy_slot[j] != -1){
+				msg.push('* ' + (j+1) + ': ' + slotitem_name(enemy_slot[j]));
+			}
+		}
+		req.push(msg);
 	}
 	chrome.runtime.sendMessage(req);
 }
