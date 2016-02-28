@@ -18,6 +18,7 @@ var $fdeck_list = {};
 var $ship_fdeck = {};
 var $ship_escape = {};	// 護衛退避したshipidのマップ.
 var $mapinfo_rank = {};	// 海域難易度 undefined:なし, 1:丙, 2:乙, 3:甲.
+var $uncleared_mapinfo = []; // 未クリアの海域情報.
 var $next_mapinfo = null;
 var $next_enemy = null;
 var $is_boss = false;
@@ -1107,7 +1108,7 @@ function print_port() {
 	var ships = Object.keys($ship_list).length;
 	var space = $max_ship - ships;
 	if (space <= 0)      req.push('### @!!艦娘保有数が満杯です!!@'); // 警告表示.
-	else if (space <= 5) req.push('### @!!艦娘保有数の上限まで残り' + space + '!!@'); // 警告表示. 
+	else if (space <= 5) req.push('### @!!艦娘保有数の上限まで残り' + space + '!!@'); // 警告表示.
 	if (unlock_lv10) req.push('### @!!Lv10以上の未ロック艦があります!!@'); // 警告表示.
 	req.push('艦娘保有数:' + ships + '/' + $max_ship
 		+ '(未ロック:' + unlock_names.length
@@ -1138,8 +1139,8 @@ function print_port() {
 	// 装備数、ロック装備一覧を表示する.
 	var items = Object.keys($slotitem_list).length;
 	var space = $max_slotitem - items;
-	if (space <= 0)       req.push('### @!!装備保有数が満杯です!!@'); // 警告表示. 
-	else if (space <= 20) req.push('### @!!装備保有数の上限まで残り' + space + '!!@'); // 警告表示. 
+	if (space <= 0)       req.push('### @!!装備保有数が満杯です!!@'); // 警告表示.
+	else if (space <= 20) req.push('### @!!装備保有数の上限まで残り' + space + '!!@'); // 警告表示.
 	req.push('装備保有数:' + items + '/' + $max_slotitem
 		+ '(未ロック:' + (items - lockeditem_count)
 		+ ', ロック:' + lockeditem_count
@@ -1287,6 +1288,9 @@ function print_port() {
 		msg.push('---');
 	}
 	//
+	// 未攻略海域を一覧表示する.
+	push_uncleared(req);
+	//
 	// 遂行中任務を一覧表示する.
 	push_quests(req);
 	//
@@ -1308,6 +1312,18 @@ function print_next(title, msg) {
 }
 
 //------------------------------------------------------------------------
+function push_uncleared(req) {
+	if ($uncleared_mapinfo.length) {
+		var msg = ['YPS_uncleared_mapinfo'];
+		$uncleared_mapinfo.forEach(function(data) {
+			msg.push('* ' + data.api_maparea_id + '-' + data.api_no + ': ' + data.api_name);
+		});
+		req.push('未クリア海域');
+		req.push(msg);
+		msg.push('---');
+	}
+}
+
 function push_quests(req) {
 	var quests = Object.keys($quest_list).length;
 	if (quests > 0) {
@@ -1379,8 +1395,10 @@ function push_all_fleets(req) {
 		var mission_end = deck.api_mission[2];
 		if (mission_end > 0) {
 			var d = new Date(mission_end);
+			var ms = d.getTime() - $pcDateTime.getTime();
+			var rest = ms > 0 ? '残' + msec_name(ms) : '終了';
 			var id = deck.api_mission[1];
-			req.push('遠征' + id + ' ' + $mst_mission[id].api_name + ': ' + d.toLocaleString());
+			req.push('遠征' + id + ' ' + $mst_mission[id].api_name + ': ' + d.toLocaleString() + '(' + rest + ')');
 			$last_mission[f_id] = '前回遠征: ' + $mst_mission[id].api_name; // 支援遠征では /api_req_mission/result が来ないので、ここで事前更新しておく.
 		}
 		else if (deck.api_id == $battle_deck_id) {
@@ -1414,7 +1432,10 @@ function on_mission_check(category) {
 	}
 	var quests = Object.keys($quest_list).length;
 	if (quests != $quest_count) req.push('### 任務リストを先頭から最終ページまでめくってください');
-	if (req.length > 1) chrome.runtime.sendMessage(req);
+	if (req.length > 1) {
+		push_all_fleets(req);
+		chrome.runtime.sendMessage(req);
+	}
 }
 
 function on_next_cell(json) {
@@ -2053,7 +2074,24 @@ function on_battle(json, battle_api_name) {
 		if (ke == -1) continue;
 		var name = ship_name(ke) + 'Lv' + d.api_ship_lv[i];
 		$enemy_ship_names.push(name);
-		req.push('\t' + i + '(' + name + ').\t' + hp_status_on_battle(nowhps[i+6], maxhps[i+6], beginhps[i+6]));
+		req.push('\t' + i + '(' + name + ').\t' + hp_status_on_battle(nowhps[i+6], maxhps[i+6], beginhps[i+6]) + '\t');
+
+		var msg = ['YPS_enemy_detail' + i];
+		var enemy_slot = d.api_eSlot[i-1];
+		var param_name = ['火力', '雷装', '対空', '装甲'];
+		var enemy_param = d.api_eParam[i-1];
+		var enemy_kyouka = d.api_eKyouka[i-1];
+		var param = [];
+		for(var j = 0; j < 4; ++j){
+			param[j] = param_name[j] + ' ' + enemy_param[j] + (enemy_kyouka[j] ? ('(+' + enemy_kyouka[j] + ')') : '');
+		}
+		msg.push('* ' + param.join(', '));
+		for(var j = 0; j < enemy_slot.length; ++j){
+			if(enemy_slot[j] != -1){
+				msg.push('* ' + (j+1) + ': ' + slotitem_name(enemy_slot[j]));
+			}
+		}
+		req.push(msg);
 	}
 	chrome.runtime.sendMessage(req);
 }
@@ -2461,9 +2499,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 海域選択メニュー.
 		func = function(json) { // 海域情報を記録する.
 			$mapinfo_rank = {};
+			$uncleared_mapinfo = [];
 			json.api_data.forEach(function(data) {
 				if (data.api_eventmap)
 					$mapinfo_rank[data.api_id] = data.api_eventmap.api_selected_rank;
+				if (!data.api_cleared)
+					$uncleared_mapinfo.push($mst_mapinfo[data.api_id]);
 			});
 		};
 	}

@@ -59,7 +59,7 @@ var $button_onclick = {};	// DOM.Id をキーとした、onclick-function
 
 function set_toggle(id, btn, target, display) {
 	if (display) {
-		$target_display[id] = true; target.style.display = 'block'; btn.value = '－';
+		$target_display[id] = true; target.style.display = ''; btn.value = '－';
 	}
 	else {
 		$target_display[id] = false; target.style.display = 'none'; btn.value = '＋';
@@ -103,9 +103,23 @@ function toggle_button(id) {
 		.replace(/<ID>/g, id);
 }
 
-function toggle_div(id) {
-	return '<div id="<ID>" style="display:none;">'
+function toggle_node(node, id){
+	return '<<NODE> id="<ID>" style="display:none;">'
+		.replace(/<NODE>/g, node)
 		.replace(/<ID>/g, id);
+}
+
+function toggle_div(id) {
+	return toggle_node('div', id);
+}
+
+function toggle_tr(id, cols){
+	return toggle_node('tr', id) + '<td colspan="<COLS>">'
+		.replace(/<COLS>/g, cols);
+}
+
+function toggle_li(id){
+	return toggle_node('li', id);
 }
 
 //------------------------------------------------------------------------
@@ -125,9 +139,20 @@ function parse_markdown(a) {
 				html = insert_string(html, html.length - end_tag[0].length, toggle_button(id)); // 直前の終了タグの内側にトグルボタンを入れる.
 			else
 				html = html.replace(/\n$/, "") + toggle_button(id) + "\n";
-			html += toggle_div(id);
+			var close_tag = '</div>';
+			if(end_tag == '</tr>'){
+				trtd = html.match(/<tr[^>]*?>(?:.(?!<tr))*?<\/tr>$/);
+				cols = trtd[0].split('<td>').length - 1;
+				html += toggle_tr(id, cols);
+				close_tag = '</tr>';
+			} else if(end_tag == '</li>'){
+				html += toggle_li(id);
+				close_tag = '</li>';
+			} else {
+				html += toggle_div(id);
+			}
 			html += parse_markdown(s);
-			html += '</div>';
+			html += close_tag;
 			continue;
 		}
 		// エスケープを行う.
