@@ -1942,8 +1942,7 @@ function calc_kouku_damage(result, title, kouku, hp, hc) {
 	result.detail.push({ title: '\t==' + title + '\t==攻撃艦\t==防御艦\t==敵撃墜\t==被撃墜\t==使用装備'});
 	if (kouku.api_stage1) {	// 制空戦.
 		var st = kouku.api_stage1;
-//@todo	result.seiku = st.api_disp_seiku ? st.api_disp_seiku : 5; // 5: 噴式強襲.
-		result.seiku = st.api_disp_seiku;
+		result.seiku = st.api_disp_seiku != null ? st.api_disp_seiku : 5; // 5: 噴式強襲.
 		result.touch = st.api_touch_plane;
 		result.f_air_lostcount += st.api_f_lostcount;
 		if (st.api_touch_plane) {
