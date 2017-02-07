@@ -3,5 +3,10 @@ description: 「艦隊これくしょん」よそ見プレイによる事故防�
 google_analytics: 
 theme: jekyll-theme-cayman
 
+exclude:
+  - CNAME
+  - README
+  - "*.sh"
+
 gems:
   - jekyll-mentions
