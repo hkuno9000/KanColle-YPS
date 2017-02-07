@@ -1,8 +1,9 @@
 # 艦これ余所見プレイ支援 KanColleYPS
 * v1.5.4 Feb.2017: 2017-02-04
-* 開発サイト: https://github.com/hkuno9000/KanColle-YPS
-* 公開サイト: http://hkuno9000.github.io/KanColle-YPS
-* リリース履歴: https://github.com/hkuno9000/KanColle-YPS/releases
+* 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
+* 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
+* リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
+* 最新版ダウンロード: [master.zip](https://github.com/hkuno9000/KanColle-YPS/archive/master.zip) , [master.tar.gz](https://github.com/hkuno9000/KanColle-YPS/archive/master.tar.gz)
 
 ## 開発コンセプト
 * 艦これの画面から目を離していても、ゲーム進行状況をすべて把握することが目的です。
@@ -100,5 +101,5 @@ Flash PlayerはChrome内蔵のほうを使用してください
 ## 参考プロジェクト
 下記を元にして自分が欲しい機能を付け足しました。
 
-* 本家 https://github.com/kageroh/cond_checker
-* 一部機能をマージ https://github.com/t-f-m/cond_checker_mod
+* 本家: [https://github.com/kageroh/cond_checker](https://github.com/kageroh/cond_checker)
+* 一部機能をマージ: [https://github.com/t-f-m/cond_checker_mod](https://github.com/t-f-m/cond_checker_mod)
