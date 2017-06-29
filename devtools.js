@@ -2215,7 +2215,11 @@ function on_battle(json, battle_api_name) {
 	}
 	if (d.api_flare_pos) {
 		// 照明弾発射(夜戦).
+<<<<<<< HEAD
 		var t0 = d.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'照明弾(夜戦)', at: nowhps_c.has2nd ? -t0 : t0});
+=======
+		var t0 = d.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'照明弾(夜戦)', at: nowhps_c && maxhps_c[1] > 0 ? -t0 : t0});
+>>>>>>> origin/night-battle-flare-fix
 		var t1 = d.api_flare_pos[1]; if (t1 != -1) result.detail.push({ty:'敵照明弾(夜戦)', at:t1+6});
 	}
 	calc_kouku_damage(result, "噴式強襲(基地航空隊)", d.api_air_base_injection, nowhps, nowhps_c);
