@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v1.5.11 May.2017: 2017-05-22
+* v1.6.0 Jul.2017 改修工廠対応beta1: 2017-07-20
 * 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
@@ -73,6 +73,9 @@ Flash PlayerはChrome内蔵のほうを使用してください
 
 ### 修理中(入渠)、要修理艦一覧サンプル
 ![kaizou screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-repair-list.png)
+
+### 改修工廠サンプル
+![remodel screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-remodel-slotitem.png)
 
 ### 未ロック、未保有、ダブリ艦一覧サンプル
 ![unlock unown double screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-unlock-unown-double.png)
