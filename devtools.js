@@ -2182,7 +2182,7 @@ function calc_damage(result, title, battle, fhp, ehp, fhc, ehc) {
 		for (var i = 0; i < battle.api_fdam.length; ++i) {
 			var damage = battle.api_fdam[i];
 			if (battle.api_frai_flag[i] || battle.api_fbak_flag[i]) {
-				var target_hp = (fhc && i >= 6) ? fhc[i-6] : fhp[i];
+				var target_hp = fhc ? fhc[i-6] : fhp[i];
 				result.detail.push({ty:"空爆", target: i, ae: 1, cl: battle_cl_name(damage ? battle.api_fcl_flag[i]+1 : 0), damage: damage, hp: target_hp});
 			}
 		}
@@ -2192,7 +2192,7 @@ function calc_damage(result, title, battle, fhp, ehp, fhc, ehc) {
 		for (var i = 0; i < battle.api_edam.length; ++i) {
 			var damage = battle.api_edam[i];
 			if (battle.api_erai_flag[i] || battle.api_ebak_flag[i]) {
-				var target_hp = (ehc && i >= 6) ? ehc[i-6] : ehp[i];
+				var target_hp = ehc ? ehc[i-6] : ehp[i];
 				result.detail.push({ty: (battle.api_fdam ? "空爆" : "支援空爆"), target: i, ae: 0, cl: battle_cl_name(damage ? battle.api_ecl_flag[i]+1 : 0), damage: damage, hp: target_hp});
 			}
 		}
