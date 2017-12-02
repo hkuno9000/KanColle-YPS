@@ -2123,6 +2123,8 @@ function calc_damage(result, title, battle, fhp, ehp, fhc, ehc) {
 			if (dam > 0) {
 				if (fhc && i >= 6)
 					fhc[i-6] -= dam;
+				else if (fhc && i >=0 && battle.api_fdam.length <= 6)
+					fhc[i] -= dam;
 				else
 					fhp[i] -= dam;
 			}
@@ -2135,6 +2137,8 @@ function calc_damage(result, title, battle, fhp, ehp, fhc, ehc) {
 			if (dam > 0) {
 				if (ehc && i >= 6)
 					ehc[i-6] -= dam;
+				else if (ehc && i >= 0 && battle.api_edam.length <= 6)
+					ehc [i] -= dam;
 				else
 					ehp[i] -= dam;
 			}
@@ -2199,9 +2203,9 @@ function calc_damage(result, title, battle, fhp, ehp, fhc, ehc) {
 	}
 	// 緊急ダメコン発動によるhp補正を行う.
 	if (fhc)
-		repair_fdeck($fdeck_list[2], 6, $f_maxhps, fhp); ///@todo check!
+		repair_fdeck($fdeck_list[2], $f_maxhps_c, fhc); ///@todo check!
 	else
-		repair_fdeck($fdeck_list[$battle_deck_id], 0, $f_maxhps, fhp);
+		repair_fdeck($fdeck_list[$battle_deck_id], $f_maxhps, fhp);
 }
 
 function calc_kouku_damage(result, title, kouku, fhp, ehp, fhc, ehc) {
@@ -2266,11 +2270,11 @@ function push_fdeck_status(req, fdeck, maxhps, nowhps, beginhps) {
 	}
 }
 
-function repair_fdeck(fdeck, idx, maxhps, nowhps) {
+function repair_fdeck(fdeck, maxhps, nowhps) {
 	if (/^演習/.test($next_enemy) || $battle_deck_id < 0) return;
-	for (var i = idx; i < nowhps.length; ++i) {
+	for (var i = 0; i < nowhps.length; ++i) {
 		if (maxhps[i] == -1) continue;
-		var ship = $ship_list[fdeck.api_ship[i-idx]];
+		var ship = $ship_list[fdeck.api_ship[i];
 		if (ship && nowhps[i] <= 0) {
 			var id = slotitem_use(ship.slot, [42, 43]);	// slotの先頭から末尾に検索し、最初に見つけたダメコン装備を抜く.
 			switch (id) {
