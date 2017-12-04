@@ -624,7 +624,10 @@ function event_kind_name(id) {	///@param id	非戦闘マスのメッセージ ap
 		case 4: return '穏やかな海峡です';
 		case 5: return '警戒が必要です';
 		case 6: return '静かな海です';
-		case 7: return '我が「連合艦隊」はドーバー海峡を進撃中です';
+		//case 7: return '我が「連合艦隊」はドーバー海峡を進撃中です'; // 2017 summer event
+		case 7: return '我が遊撃部隊は堂々と進撃中。現海域に敵影なし。';
+		case 8: return '艦隊は対潜警戒進撃中。引き続き、対潜対空警戒を厳とせよ。';
+		case 9: return '栗田艦隊はこれより戦闘海域に突入する。天祐を確信し、全軍突撃せよ。';
 		default: return '??'+to_string(id);
 	}
 }
@@ -2428,12 +2431,12 @@ function on_battle(json, battle_api_name) {
 	if (d.api_deck_id == null) d.api_deck_id = d.api_dock_id; // battleのデータは、綴りミスがあるので補正する.
 	if (d.api_escape_idx) {
 		d.api_escape_idx.forEach(function(idx) {
-			f_maxhps[idx] = -1;	// 護衛退避した艦を艦隊リストから抜く. idx=1..6
+			f_maxhps[idx-1] = -1;	// 護衛退避した艦を艦隊リストから抜く. idx=1..6
 		});
 	}
 	if (d.api_escape_idx_combined) {
 		d.api_escape_idx_combined.forEach(function(idx) {
-			f_maxhps_c[idx] = -1;	// 護衛退避した艦を第二艦隊リストから抜く. idx=1..6
+			f_maxhps_c[idx-1] = -1;	// 護衛退避した艦を第二艦隊リストから抜く. idx=1..6
 		});
 	}
 	if (d.api_touch_plane) {
@@ -2444,9 +2447,25 @@ function on_battle(json, battle_api_name) {
 	}
 	if (d.api_flare_pos) {
 		// 照明弾発射(夜戦).
-		var t0 = d.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'照明弾(夜戦)',   at: (d.api_active_deck[0]==2? t0-1+6 : t0-1), ae: 0}); ///@todo t0 is 1 based. is it correct?
+		var t0 = d.api_flare_pos[0];
+		if (t0 != -1) {
+			if (d.api_active_deck) {
+				if (d.api_active_deck[0] == 2) t0 += 6;
+			}
+			result.detail.push({ty:'照明弾(夜戦)',   at: t0-1, ae: 0}); ///@todo t0 is 1 based. is it correct?
+		}
 		var t1 = d.api_flare_pos[1]; if (t1 != -1) result.detail.push({ty:'敵照明弾(夜戦)', at: t1-1, ae: 1});
 	}
+	var dns = d.api_n_support_info;
+	if (dns) {
+		if (dns.api_support_airatack) dns.api_support_airattack = dns.api_support_airatack; // 綴り訂正.
+		if (d.api_n_support_flag == 1) calc_damage(result, "夜戦航空支援", ds.api_support_airattack.api_stage3, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
+		if (d.api_n_support_flag == 2) calc_damage(result, "夜戦支援射撃", ds.api_support_hourai,               f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
+		if (d.api_n_support_flag == 3) calc_damage(result, "夜戦支援長距離雷撃", ds.api_support_hourai,         f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
+	}
+	calc_damage(result, "夜戦砲撃", d.api_hougeki,         f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// midnight
+	calc_damage(result, "夜戦砲撃1", d.api_n_hougeki1, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 夜戦砲撃一巡目.
+	calc_damage(result, "夜戦砲撃2", d.api_n_hougeki2, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 夜戦砲撃二巡目.
 	calc_kouku_damage(result, "噴式強襲(基地航空隊)", d.api_air_base_injection, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
 	calc_kouku_damage(result, "噴式強襲", d.api_injection_kouku, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
 	if (d.api_air_base_attack) {
@@ -2465,19 +2484,25 @@ function on_battle(json, battle_api_name) {
 	}
 	calc_damage(result, "先制対潜", d.api_opening_taisen,  f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 対潜先制爆雷攻撃.　2016-06-30メンテ明けから追加.
 	calc_damage(result, "開幕雷撃", d.api_opening_atack,   f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 開幕雷撃.
-	calc_damage(result, "夜戦砲撃", d.api_hougeki,         f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// midnight
 	switch ($combined_flag) {
 	default:// 不明.
 	case 0: // 通常艦隊.
 		if (e_nowhps_c) {	// 敵軍連合艦隊.
-			calc_damage(result, "砲撃戦(護衛)", d.api_hougeki1, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 砲撃一巡目(友軍 vs 敵護衛艦隊).
-			calc_damage(result, "雷撃戦(連合)", d.api_raigeki,  f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 雷撃戦(友軍からの攻撃対象は敵主力・護衛の双方).
-			calc_damage(result, "砲撃戦(主力)", d.api_hougeki2, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 砲撃二巡目(友軍 vs 敵主力艦隊).
-			calc_damage(result, "砲撃戦(連合)", d.api_hougeki3, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 砲撃三巡目(友軍からの攻撃対象は敵主力・護衛の双方).
-			break;
+			if (!d.api_day_flag){
+				calc_damage(result, "砲撃戦(護衛)", d.api_hougeki1, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 砲撃一巡目(友軍 vs 敵護衛艦隊).
+				calc_damage(result, "雷撃戦(連合)", d.api_raigeki,  f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 雷撃戦(友軍からの攻撃対象は敵主力・護衛の双方).
+				calc_damage(result, "砲撃戦(主力)", d.api_hougeki2, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 砲撃二巡目(友軍 vs 敵主力艦隊).
+				calc_damage(result, "砲撃戦(連合)", d.api_hougeki3, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 砲撃三巡目(友軍からの攻撃対象は敵主力・護衛の双方).
+				break;
+			} else if (d.api_day_flag == 1) {
+				calc_damage(result, "昼戦砲撃1", d.api_hougeki1, f_nowhps, e_nowhps);	// 昼戦砲撃一巡目.
+				calc_damage(result, "昼戦砲撃2", d.api_hougeki2, f_nowhps, e_nowhps);	// 昼戦砲撃二巡目.
+				calc_damage(result, "昼戦雷撃",  d.api_raigeki,  f_nowhps, e_nowhps);	// 昼戦雷撃戦.
+			}
 		}
 		calc_damage(result, "砲撃戦1", d.api_hougeki1, f_nowhps, e_nowhps);	// 砲撃一巡目.
 		calc_damage(result, "砲撃戦2", d.api_hougeki2, f_nowhps, e_nowhps);	// 砲撃二巡目.
+		calc_damage(result, "砲撃戦3", d.api_hougeki3, f_nowhps, e_nowhps);	// 砲撃三巡目.
 		calc_damage(result, "雷撃戦",  d.api_raigeki,  f_nowhps, e_nowhps);	// 雷撃戦.
 		break;
 	case 1: // 連合艦隊(機動部隊).
