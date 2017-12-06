@@ -2279,7 +2279,7 @@ function repair_fdeck(fdeck, maxhps, nowhps) {
 	if (/^演習/.test($next_enemy) || $battle_deck_id < 0) return;
 	for (var i = 0; i < nowhps.length; ++i) {
 		if (maxhps[i] == -1) continue;
-		var ship = $ship_list[fdeck.api_ship[i];
+		var ship = $ship_list[fdeck.api_ship[i]];
 		if (ship && nowhps[i] <= 0) {
 			var id = slotitem_use(ship.slot, [42, 43]);	// slotの先頭から末尾に検索し、最初に見つけたダメコン装備を抜く.
 			switch (id) {
