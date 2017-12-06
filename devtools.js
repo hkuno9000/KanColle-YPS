@@ -2495,9 +2495,9 @@ function on_battle(json, battle_api_name) {
 				calc_damage(result, "砲撃戦(連合)", d.api_hougeki3, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 砲撃三巡目(友軍からの攻撃対象は敵主力・護衛の双方).
 				break;
 			} else if (d.api_day_flag == 1) {
-				calc_damage(result, "昼戦砲撃1", d.api_hougeki1, f_nowhps, e_nowhps);	// 昼戦砲撃一巡目.
-				calc_damage(result, "昼戦砲撃2", d.api_hougeki2, f_nowhps, e_nowhps);	// 昼戦砲撃二巡目.
-				calc_damage(result, "昼戦雷撃",  d.api_raigeki,  f_nowhps, e_nowhps);	// 昼戦雷撃戦.
+				calc_damage(result, "昼戦砲撃1", d.api_hougeki1, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 昼戦砲撃一巡目.
+				calc_damage(result, "昼戦砲撃2", d.api_hougeki2, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 昼戦砲撃二巡目.
+				calc_damage(result, "昼戦雷撃",  d.api_raigeki,  f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 昼戦雷撃戦.
 			}
 		}
 		calc_damage(result, "砲撃戦1", d.api_hougeki1, f_nowhps, e_nowhps);	// 砲撃一巡目.
