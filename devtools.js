@@ -2459,9 +2459,9 @@ function on_battle(json, battle_api_name) {
 	var dns = d.api_n_support_info;
 	if (dns) {
 		if (dns.api_support_airatack) dns.api_support_airattack = dns.api_support_airatack; // 綴り訂正.
-		if (d.api_n_support_flag == 1) calc_damage(result, "夜戦航空支援", ds.api_support_airattack.api_stage3, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
-		if (d.api_n_support_flag == 2) calc_damage(result, "夜戦支援射撃", ds.api_support_hourai,               f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
-		if (d.api_n_support_flag == 3) calc_damage(result, "夜戦支援長距離雷撃", ds.api_support_hourai,         f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
+		if (d.api_n_support_flag == 1) calc_damage(result, "夜戦航空支援", dns.api_support_airattack.api_stage3, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
+		if (d.api_n_support_flag == 2) calc_damage(result, "夜戦支援射撃", dns.api_support_hourai,               f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
+		if (d.api_n_support_flag == 3) calc_damage(result, "夜戦支援長距離雷撃", dns.api_support_hourai,         f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);
 	}
 	calc_damage(result, "夜戦砲撃", d.api_hougeki,         f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// midnight
 	calc_damage(result, "夜戦砲撃1", d.api_n_hougeki1, f_nowhps, e_nowhps, f_nowhps_c, e_nowhps_c);	// 夜戦砲撃一巡目.
