@@ -2540,6 +2540,7 @@ function on_battle(json, battle_api_name) {
 			+ '/' + match_name(d.api_formation[2])
 			+ '/敵' + formation_name(d.api_formation[1]);
 		if (d.api_support_flag) fmt += '+' + support_name(d.api_support_flag);
+		if (d.api_n_support_flag) fmt += '+' + support_name(d.api_n_support_flag);
 		if (d.api_air_base_attack) fmt += '+基地航空隊';
 		if (result.seiku != null) fmt += '/' + seiku_name(result.seiku);
 		$enemy_formation = formation_name(d.api_formation[1]);
