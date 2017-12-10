@@ -2594,7 +2594,7 @@ function on_battle(json, battle_api_name) {
 				if (dtnext && dtnext.title) continue;	// タイトルのみで戦闘記録なしの場合（例：敵潜水艦のみの航空戦空爆）は、タイトルを除去する.
 				msg.push(dt.title); continue;
 			}
-			if (dt.damage && dt.target != null) dt.damage += ':' + damage_name(dt.hp, (dt.ae ? (dt.target >= 6 ? f_maxhps_c[dt.target-6] : f_maxhps[dt.target]) : (dt.target >= 6 ? e_maxhps_c[dt.target-6] : e_maxhps[dt.target])));
+			if (dt.damage && dt.target != null) dt.damage += ':' + damage_name(dt.hp, (dt.ae ? (dt.target >= f_maxhps.length ? f_maxhps_c[dt.target-6] : f_maxhps[dt.target]) : (dt.target >= 6 ? e_maxhps_c[dt.target-6] : e_maxhps[dt.target])));
 			msg.push('\t' + dt.ty
 				+ '\t' + ship_name_lv(dt.at, dt.ae)
 				+ '\t' + ship_name_lv(dt.target, !dt.ae)
