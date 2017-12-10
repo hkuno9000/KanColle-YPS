@@ -3232,8 +3232,14 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$e_beginhps_s = null;
 		func = on_battle;
 	}
-	else if (api_name == '/api_req_sortie/night_to_day') {
+	else if (api_name == '/api_req_sortie/night_to_day'
+		|| api_name == '/api_req_combined_battle/ec_night_to_day') {
 		// 夜戦→昼戦追撃.
+		$battle_count++;
+		$f_beginhps = null;
+		$e_beginhps = null;
+		$f_beginhps_s = null;
+		$e_beginhps_s = null;
 		func = on_battle;
 	}
 	else if (api_name == '/api_req_practice/battle') {
