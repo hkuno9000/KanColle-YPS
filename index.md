@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v1.7.2 艦娘一斉解体、装備保管解体対応: 2017-12-12
+* v1.7.3 新戦闘JSON対応改善、戦闘詳報に撃沈済表示: 2018-01-09
 * 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
