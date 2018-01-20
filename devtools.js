@@ -91,6 +91,9 @@ function Ship(data, ship) {
 	this.ndock_item	= data.api_ndock_item; // 入渠消費量[燃料,鋼材].
 	this.ship_id	= data.api_ship_id;
 	this.kyouka	= data.api_kyouka;	// 近代化改修による強化値[火力,雷装,対空,装甲,運].
+	this.taiku = data.api_taiku;
+	this.taisen = data.api_taisen;
+	this.sakuteki = data.api_sakuteki;
 	this.nextlv	= data.api_exp[1];
 	if (data.api_slot_ex > 0) {		// api_slot_ex:: 0:増設スロットなし, -1:増設スロット空,　1以上:増設スロット装備ID.
 		this.slot.push(data.api_slot_ex);
@@ -206,6 +209,24 @@ Ship.prototype.slot_seiku = function() {	///< 制空値.
 			a += slotitem_seiku(value.item_id, value.level, value.alv, onslot[i]);
 		}
 	}
+	return a;
+};
+
+Ship.prototype.slot_sakuteki_25 = function() {	///< 2-5索敵値.
+	var slot = this.slot;
+	var onslot = this.onslot;
+	var raw = this.sakuteki[0];
+	var a = 0;
+	for (var i = 0; i < slot.length; ++i) {
+		var value = $slotitem_list[slot[i]];
+		if (value) {
+			a += slotitem_sakuteki(value.item_id, value.level);
+			// 艦娘の素索敵値を計算する。this.sakuteki[1]はケッコンカッコカリ前の索敵値なので使えない。
+			raw -= $mst_slotitem[value.item_id].api_saku;
+		}
+	}
+	// 索敵スコアの「＋√(各艦娘の素索敵)」の部分
+	a += Math.sqrt(raw);
 	return a;
 };
 
@@ -721,6 +742,63 @@ function slotitem_seiku(id, lv, alv, n) {
 	return Math.floor(seiku);
 }
 
+function slotitem_sakuteki(id, lv){
+	// sakuteki (per_item) ::= M * S *(raw_saku + K * sqrt(lv)) 
+	// M ::= 海域分岐点係数：2-5ボス前(H,Iマス)＝1、6-2(F,Hマス)・6-3ボス前(Hマス)＝3、3-5(Gマス)・6-1(E、Fマス)＝4。
+	// 普通は2-5索敵値が一番厳しいので、分岐点係数は1に固定。(暫定)
+	// raw_saku ::= 装備素索敵値
+	// lv ::= 改修レベル:0-10
+	// S ::= 装備倍率
+	// K ::= 装備改修による索敵強化倍率
+	var item = $mst_slotitem[id];
+	var sakuteki = 0;
+	var raw_saku = item.api_saku;
+	// 改修による索敵強化値
+	switch (item.api_type[2]) {
+		case 12:// 小型電探.
+			raw_saku += 1.25*Math.sqrt(lv);
+			break;
+		case 13:// 大型電探.
+			raw_saku += 1.40*Math.sqrt(lv);
+			break;
+		case 9:	// 艦上偵察機.
+		case 10:// 水上偵察機.
+			raw_saku += 1.20*Math.sqrt(lv);
+			break;
+	}
+	switch (item.api_type[2]) {
+		case 7:	// 艦上爆撃機.
+		case 12:// 小型電探.
+		case 13:// 大型電探.
+		case 29:// 探照灯.
+		case 42:// 大型探照灯.
+		case 57:// 噴式戦闘爆撃機.
+		case 6:	// 艦上戦闘機.
+		case 45:// 水上戦闘機.
+		case 41:// 大型飛行艇.
+		case 14:// ソナー.
+		case 39:// 水上艦要員.
+		case 26:// 対潜哨戒機.
+		case 34:// 艦隊司令部施設.
+		case 51:// 潜水艦装備.
+			sakuteki += 0.6 * raw_saku;
+			break;
+		case 8:	// 艦上攻撃機.
+			sakuteki += 0.8 * raw_saku;
+			break;
+		case 9:	// 艦上偵察機.
+			sakuteki += 1.0 * raw_saku;
+			break;
+		case 10:// 水上偵察機.
+			sakuteki += 1.2 * raw_saku;
+			break;
+		case 11:// 水上爆撃機.
+			sakuteki += 1.1 * raw_saku;
+			break;
+	}
+	return sakuteki;
+}
+
 function slotitem_names(idlist) {
 	if (!idlist) return '';
 	var names = [];
@@ -1053,6 +1131,7 @@ function fleet_brief_status(deck, deck2) {
 	var akashi = '';
 	var blank_slot_num = 0;
 	var slot_seiku = 0;
+	var slot_sakuteki_25 = 0;
 	var list = deck.api_ship;
 	if (deck2) list = list.concat(deck2.api_ship);
 	for (var i in list) {
@@ -1080,6 +1159,7 @@ function fleet_brief_status(deck, deck2) {
 			});
 			blank_slot_num += ship.blank_slot_num();
 			slot_seiku     += ship.slot_seiku();
+			slot_sakuteki_25 += ship.slot_sakuteki_25();
 			// 明石検出.
 			var name = ship.name_lv();
 			if (/明石/.test(name)) {
@@ -1102,6 +1182,7 @@ function fleet_brief_status(deck, deck2) {
 		+ (drumcan.sum ? ' ドラム缶' + drumcan.sum + '個' + drumcan.ships + '隻' : '')
 		+ (daihatu.up  ? ' 大発' + daihatu.sum + '個'+ daihatu.calc_up() + '%遠征UP' : '')
 		+ (slot_seiku  ? ' 制空値' + slot_seiku : '')
+		+ ' 2-5索敵値' + slot_sakuteki_25.toFixed(2);
 		+ (blank_slot_num ? ' 空スロット' + blank_slot_num : '')
 		+ akashi
 		;
@@ -1110,10 +1191,16 @@ function fleet_brief_status(deck, deck2) {
 
 function push_fleet_status(msg, deck) {
 	var lv_sum = 0;
+	var sakuteki_sum = 0;
+	var taiku_sum = 0;
+	var taisen_sum = 0;
 	var fleet_ships = 0;
 	for (var i = 0, ship, s_id; ship = $ship_list[s_id = deck.api_ship[i]]; ++i) {
 		fleet_ships++;
 		lv_sum += ship.lv;
+		sakuteki_sum += ship.sakuteki[0];
+		taiku_sum += ship.taiku[0];
+		taisen_sum += ship.taisen[0];
 		var hp_str = '';	// hp.
 		var rp_str = '';	// 修理.
 		if (ship.nowhp / ship.maxhp <= 0.75) { // 小破以上なら値を設定する.
@@ -1138,7 +1225,7 @@ function push_fleet_status(msg, deck) {
 			+ '\t' + ship.next_level()
 			);
 	}
-	msg.push('\t合計' + fleet_ships +'隻:\tLv' + lv_sum);
+	msg.push('\t合計' + fleet_ships +'隻:\tLv' + lv_sum + ' 索敵:' + sakuteki_sum + ' 対空:' + taiku_sum + ' 対潜:' + taisen_sum);
 }
 
 function update_material(material, sum) {
