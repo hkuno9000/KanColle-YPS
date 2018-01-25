@@ -5,6 +5,7 @@ var $mst_slotitemeq	= load_storage('mst_slotitemeq');
 var $mst_mission	= load_storage('mst_mission');
 var $mst_useitem	= load_storage('mst_useitem');
 var $mst_mapinfo	= load_storage('mst_mapinfo');
+var $mst_maparea	= load_storage('mst_maparea');
 var $ship_list		= load_storage('ship_list');
 var $slotitem_list	= load_storage('slotitem_list');
 var $remodel_slotlist = load_storage('remodel_slotlist');
@@ -406,6 +407,15 @@ function update_mst_mapinfo(list) {
 		$mst_mapinfo[data.api_id] = data;
 	});
 	save_storage('mst_mapinfo', $mst_mapinfo);
+}
+
+function update_mst_maparea(list) {
+	if (!list) return;
+	$mst_maparea = {};
+	list.forEach(function(data) {
+		$mst_maparea[data.api_id] = data.api_name;
+	});
+	save_storage('mst_maparea', $mst_maparea);
 }
 
 function get_weekly() {
@@ -847,6 +857,40 @@ function map_name(mst) { // "演習 5", "1-1: 鎮守府正面海域", "40-2: 台
 	if (mst.api_no) s = mst.api_maparea_id + '-' + mst.api_no + ': ' + s;
 	if (mst.yps_opt_name) s +=  ' ' + mst.yps_opt_name;
 	return s;
+}
+
+function get_maparea_name(id) {
+	return $mst_maparea[id];
+}
+
+function get_air_base_action_name(kind) {
+	switch (kind) {
+	case 0: return '待機';
+	case 1: return '出撃';
+	case 2: return '防空';
+	case 3: return '退避';
+	case 4: return '休息';
+	default: return kind;
+	}
+}
+
+function get_squadron_name(sid) {
+	switch (sid) {
+	case 1: return '第一中隊';
+	case 2: return '第二中隊';
+	case 3: return '第三中隊';
+	case 4: return '第四中隊';
+	default: return sid;
+	}
+}
+
+function get_squadron_cond_name(cond) {
+	switch (cond) {
+	case 1: return '通常';
+	case 2: return '疲労';
+	case 3: return '赤疲労';
+	default: return cond;
+	}
 }
 
 function push_listform(ary, data) {
@@ -1604,7 +1648,7 @@ function print_next(title, msg) {
 //------------------------------------------------------------------------
 // 海域選択画面表示.
 //
-function print_mapinfo(uncleared) {
+function print_mapinfo(uncleared, air_base) {
 	var req = ["# 海域選択"];
 	if (uncleared.length > 0) {
 		var msg = ['YPS_uncleared_mapinfo'];
@@ -1612,6 +1656,11 @@ function print_mapinfo(uncleared) {
 		req.push('未クリア海域');
 		req.push(msg);
 		msg.push('---');
+	}
+	if (air_base.length > 0) {
+		req.push('基地航空隊');
+		air_base.push('---');
+		req.push(air_base);
 	}
 	push_quests(req);
 	push_all_fleets(req);
@@ -2668,6 +2717,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_mst_useitem(json.api_data.api_mst_useitem);
 			update_mst_mission(json.api_data.api_mst_mission);
 			update_mst_mapinfo(json.api_data.api_mst_mapinfo);
+			update_mst_maparea(json.api_data.api_mst_maparea);
 			sync_cloud();
 			chrome.runtime.sendMessage("## ロード完了");
 			debug_print_mst_slotitem();
@@ -3155,7 +3205,43 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					uncleared.push('* ' + map_name(mst));
 				}
 			});
-			print_mapinfo(uncleared);
+
+			// 基地航空隊情報
+			var air_base = [];
+			if (json.api_data.api_air_base.length > 0) {
+				air_base.push('YPS_air_base_mapinfo');
+				json.api_data.api_air_base.forEach(function(data) {
+					var planes = [];
+					planes.push('YPS_air_base_' + data.api_area_id + '_' + data.api_rid);
+					var charged = true;
+					var plane_info = data.api_plane_info;
+					for (var i = 0; i < plane_info.length; i++) {
+						var pi = plane_info[i];
+						if (pi.api_state > 0) {
+							var item = $slotitem_list[pi.api_slotid];
+							planes.push(
+								get_squadron_name(pi.api_squadron_id) + ' '
+								+ (pi.api_state == 2 ? '配置転換中' : get_squadron_cond_name(pi.api_cond)) + ': '
+								+ slotitem_name(item.item_id, item.lv, item.alv, item.p_alv, pi.api_count, pi.api_max_count)
+							);
+							if (pi.api_count != pi.api_max_count) {
+								charged = false;
+							}
+						} else {
+							planes.push(get_squadron_name(pi.api_squadron_id) + ' 未配備:');
+						}
+					}
+
+					air_base.push(
+						get_air_base_action_name(data.api_action_kind) + " "
+						+ data.api_name + (charged ? ' ' : ' 未補充')
+						+ " (対象海域 " + get_maparea_name(data.api_area_id)
+						+ " 戦闘行動半径" + data.api_distance + ")"
+					);
+					air_base.push(planes);
+				});
+			}
+			print_mapinfo(uncleared, air_base);
 		};
 	}
 	else if (api_name == '/api_req_map/select_eventmap_rank') {
