@@ -3208,7 +3208,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 
 			// 基地航空隊情報
 			var air_base = [];
-			if (json.api_data.api_air_base.length > 0) {
+			// 基地航空隊の開放前は json.api_data.api_air_base は存在しない
+			if (json.api_data.api_air_base) {
 				air_base.push('YPS_air_base_mapinfo');
 				json.api_data.api_air_base.forEach(function(data) {
 					var planes = [];
