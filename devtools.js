@@ -1217,6 +1217,7 @@ function fleet_brief_status(deck, deck2) {
 			daihatu.count_up(ship);
 		}
 	}
+	slot_sakuteki_25 += (2 * (6 - fleet_ships) - Math.ceil(0.4 * $command_lv));
 	var ret = kira_names(cond_list)
 		+ ' 燃料' + fuel + percent_name_unless100(fuel, fuel_max)
 		+ ' 弾薬' + bull + percent_name_unless100(bull, bull_max)
