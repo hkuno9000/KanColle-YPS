@@ -19,6 +19,7 @@ var $tmp_ship_id = -1000;	// ドロップ艦の仮ID.
 var $tmp_slot_id = -1000;	// ドロップ艦装備の仮ID.
 var $max_ship = 0;
 var $max_slotitem = 0;
+var $command_lv = 0;
 var $combined_flag = 0;
 var $fdeck_list = {};
 var $ship_fdeck = {};
@@ -1177,6 +1178,7 @@ function fleet_brief_status(deck, deck2) {
 	var blank_slot_num = 0;
 	var slot_seiku = 0;
 	var slot_sakuteki_25 = 0;
+	var fleet_ships = 0;
 	var list = deck.api_ship;
 	if (deck2) list = list.concat(deck2.api_ship);
 	for (var i in list) {
@@ -1205,6 +1207,7 @@ function fleet_brief_status(deck, deck2) {
 			blank_slot_num += ship.blank_slot_num();
 			slot_seiku     += ship.slot_seiku();
 			slot_sakuteki_25 += ship.slot_sakuteki_25();
+			fleet_ships++;
 			// 明石検出.
 			var name = ship.name_lv();
 			if (/明石/.test(name)) {
@@ -3185,6 +3188,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			$combined_flag = json.api_data.api_combined_flag;	// 連合艦隊編成有無.
 			update_material(json.api_data.api_material, $material.autosupply);	// 資材を更新する. 差分を自然増加として記録する.
 			var basic = json.api_data.api_basic;
+			$command_lv   = basic.api_level;
 			$max_ship     = basic.api_max_chara;
 			$max_slotitem = basic.api_max_slotitem + 3;
 			if ($battle_deck_id > 0) {
