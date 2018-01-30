@@ -209,7 +209,7 @@ Ship.prototype.slot_seiku = function() {	///< 制空値.
 	for (var i = 0; i < slot.length; ++i) {
 		var value = $slotitem_list[slot[i]];
 		if (value) {
-			a += slotitem_seiku(value.item_id, value.level, value.alv, onslot[i]);
+			a += slotitem_seiku(value.item_id, value.level, value.alv, onslot[i], -1);
 		}
 	}
 	return a;
@@ -693,10 +693,12 @@ function slotitem_name(id, lv, alv, p_alv, n, max) {
 	return name;
 }
 
-function slotitem_seiku(id, lv, alv, n) {
+function slotitem_seiku(id, lv, alv, n, type) {
+	// type -1:艦隊制空戦 1:基地航空隊出撃　2:基地航空隊防空
 	// https://gist.github.com/YSRKEN/4cdecc6e8a1c2c75b13b08126c94f4cf の制空値計算式を採用する.
 	// http://kancollecalc.web.fc2.com/air_supremacy.html の計算結果に合うように計算式を修正する.
-	// seiku ::= floor((P + Ga * lv + 1.5 * In) * sqrt(n) + sqrt(v/10) + Vc)
+	// seiku(attack) ::= floor((P + Ga * lv + 1.5 * In) * sqrt(n) + sqrt(v/10) + Vc)
+	// seiku(intercept) ::= floor((P + Ga * lv + In + 2 * Ba) * sqrt(n) + sqrt(v/10) + Vc) 
 	// lv ::= 改修レベル:0-10
 	// alv::= 熟練度:0-7
 	// n  ::= 搭載機数.
@@ -705,15 +707,18 @@ function slotitem_seiku(id, lv, alv, n) {
 	// Ga ::= 改修レベル係数. 艦上戦闘機&水上戦闘機:0.2, 艦上爆撃機:0.25, その他:0
 	// v  ::= 内部熟練度:0-120
 	// Vc ::= 熟練度ボーナス. 艦上戦闘機&水上戦闘機:0-22, 水上爆撃機:0-6, その他:0
+	// Ba ::= 対爆値. api_houm
 	var item = $mst_slotitem[id];
 	if (!is_airplane(item)) return 0;
 	var seiku = 0;
 	var In = 0;
+	var Ba = 0;
 	var Ga = 0;
 	var Vc = null;
 	switch (item.api_type[2]) {
 	case 48:// 局地戦闘機.
 		In = item.api_houk;
+		Ba = item.api_houm;
 		break;
 	case 6:	// 艦上戦闘機.
 	case 45:// 水上戦闘機.
@@ -728,9 +733,11 @@ function slotitem_seiku(id, lv, alv, n) {
 		break;
 	case 9:	// 艦上偵察機.
 	case 10:// 水上偵察機.
+	case 41:// 大型飛行艇.
+		if (type < 0) return 0; // 制空戦に参加しない機種.
+		else break;
 	case 25:// オートジャイロ.
 	case 26:// 対潜哨戒機.
-	case 41:// 大型飛行艇.
 		return 0; // 制空戦に参加しない機種.
 	case 8:	// 艦上攻撃機.
 	case 47:// 陸上攻撃機.
@@ -743,7 +750,8 @@ function slotitem_seiku(id, lv, alv, n) {
 	}
 	if (n > 0) {
 		var P = item.api_tyku;
-		seiku += (P + Ga * lv + 1.5 * In) * Math.sqrt(n);
+		if (type != 2) seiku += (P + Ga * lv + 1.5 * In) * Math.sqrt(n);
+		else seiku += (P + Ga * lv + In + 2 * Ba) * Math.sqrt(n);
 	}
 	if (alv > 0) {
 		var v = [0, 10, 25, 40, 55, 70, 85, 100][alv];	// 内部熟練度:下端.
@@ -752,6 +760,36 @@ function slotitem_seiku(id, lv, alv, n) {
 		if (Vc) seiku += Vc[alv];	// Vc: 艦上戦闘機、水上戦闘機.
 	}
 	return Math.floor(seiku);
+}
+
+function slotitem_intercept_bonus(id){
+	var item = $mst_slotitem[id];
+	var saku = item.api_saku;
+	switch (item.api_type[2]) {
+	case 10:// 水上偵察機.
+	case 41:// 大型飛行艇.
+		if(saku >=9) return 1.16;
+		if(saku ==8) return 1.13;
+		if(saku <=7) return 1.1;
+	case 9:	// 艦上偵察機.
+	case 94:// 艦上偵察機（II）.
+		if(saku >=9) return 1.3;
+		if(saku <=7) return 1.2;
+	case 48:// 局地戦闘機.
+	case 6:	// 艦上戦闘機.
+	case 45:// 水上戦闘機.
+	case 7:	// 艦上爆撃機.
+	case 11:// 水上爆撃機.
+	case 25:// オートジャイロ.
+	case 26:// 対潜哨戒機.
+	case 8:	// 艦上攻撃機.
+	case 47:// 陸上攻撃機.
+	case 56:// 噴式戦闘機.
+	case 57:// 噴式戦闘爆撃機.
+	case 58:// 噴式攻撃機.
+	case 59:// 噴式偵察機.
+		return 1;
+	}
 }
 
 function slotitem_sakuteki(id, lv){
@@ -3334,6 +3372,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					planes.push('YPS_air_base_' + data.api_area_id + '_' + data.api_rid);
 					var charged = true;
 					var plane_info = data.api_plane_info;
+					var slot_seiku = 0;
+					var base_intercept_bonus = 1;
 					for (var i = 0; i < plane_info.length; i++) {
 						var pi = plane_info[i];
 						if (pi.api_state > 0) {
@@ -3346,16 +3386,22 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 							if (pi.api_count != pi.api_max_count) {
 								charged = false;
 							}
+							slot_seiku += slotitem_seiku(item.item_id, item.level, item.alv, pi.api_count, data.api_action_kind);
+							var plane_intercept_bonus = slotitem_intercept_bonus(item.item_id);
+							if (plane_intercept_bonus > base_intercept_bonus)
+								base_intercept_bonus = plane_intercept_bonus;
 						} else {
 							planes.push(get_squadron_name(pi.api_squadron_id) + ' 未配備:');
 						}
 					}
+					if (data.api_action_kind == 2) slot_seiku *= base_intercept_bonus;
 
 					air_base.push(
 						get_air_base_action_name(data.api_action_kind) + " "
 						+ data.api_name + (charged ? ' ' : ' 未補充')
 						+ " (対象海域 " + get_maparea_name(data.api_area_id)
-						+ " 戦闘行動半径" + data.api_distance + ")"
+						+ " 戦闘行動半径" + data.api_distance
+						+ " 制空値:"  + Math.floor(slot_seiku) + ")"
 					);
 					air_base.push(planes);
 				});
