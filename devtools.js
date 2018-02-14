@@ -3392,7 +3392,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 						if (pi.api_state > 0) {
 							var item = $slotitem_list[pi.api_slotid];
 							planes.push(
-								get_squadron_name(pi.api_squadron_id) + ' '
+								'* '
+								+ get_squadron_name(pi.api_squadron_id) + ' '
 								+ (pi.api_state == 2 ? '配置転換中' : get_squadron_cond_name(pi.api_cond)) + ': '
 								+ slotitem_name(item.item_id, item.lv, item.alv, item.p_alv, pi.api_count, pi.api_max_count)
 							);
@@ -3404,7 +3405,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 							if (plane_intercept_bonus > base_intercept_bonus)
 								base_intercept_bonus = plane_intercept_bonus;
 						} else {
-							planes.push(get_squadron_name(pi.api_squadron_id) + ' 未配備:');
+							planes.push('* ' + get_squadron_name(pi.api_squadron_id) + ' 未配備:');
 						}
 					}
 					if (data.api_action_kind == 2) slot_seiku *= base_intercept_bonus;
