@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v1.7.5 各海域の索敵スコア対応: 2018-02-04
+* v1.7.6 2018冬イベント対応1(海域難易度：丁): 2018-02-17
 * 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
@@ -60,16 +60,14 @@ Flash PlayerはChrome内蔵のほうを使用してください
 対応している海域番号を表に示します。
 これ以外の海域については"分岐点係数;"を指定して各自対応願います。
 
-海域番号 | 分岐点係数 | 外れ回避に必要な索敵スコア
------|-----------:|-----------------:|
-1-6 | 3 | 30
-2-5 | 1 | 33
-3-5 | 4 | 28
-6-1 E | 4 | 16
-6-1 F | 4 | 25
-6-2 F | 3 | 50
-6-2 H | 3 | 40
-6-5 G | 3 | 50
+海域番号 | 分岐点係数 | 分岐マス名:外れ回避に必要な索敵スコア
+---------|-----------:|-----------------|
+1-6 | 3 | M:30
+2-5 | 1 | H:33
+3-5 | 4 | G:28
+6-1 | 4 | E:16, F:25
+6-2 | 3 | F:50, H:40
+6-5 | 3 | G:50
 
 ### 母港画面サンプル
 ![port screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-port.png)
