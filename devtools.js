@@ -2648,10 +2648,8 @@ function on_battle(json, battle_api_name) {
 	}
 	if (d.api_flare_pos) {
 		// 照明弾発射(夜戦).
-		var act0 = (d.api_active_deck && d.api_active_deck[0] == 2) ? fidx2nd : 0;
-		var act1 = (d.api_active_deck && d.api_active_deck[1] == 2) ? eidx2nd : 0; ///@todo would we need act1?
-		var t0 = d.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'照明弾(夜戦)',   at: t0+act0, ae: 0})
-		var t1 = d.api_flare_pos[1]; if (t1 != -1) result.detail.push({ty:'敵照明弾(夜戦)', at: t1+act1, ae: 1});
+		var t0 = d.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'照明弾(夜戦)',   at: t0, ae: 0});
+		var t1 = d.api_flare_pos[1]; if (t1 != -1) result.detail.push({ty:'敵照明弾(夜戦)', at: t1, ae: 1});
 	}
 	// 友軍艦隊(NPC). @since 2018.Feb WinterEvent
 	var ff = d.api_friendly_battle;
