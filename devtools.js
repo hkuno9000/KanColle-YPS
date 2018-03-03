@@ -2641,6 +2641,13 @@ function on_battle(json, battle_api_name) {
 			f_maxhps[idx-1+fidx2nd] = -1;	// 護衛退避した艦を第二艦隊リストから抜く. idx=1..6
 		});
 	}
+	// 友軍艦隊(NPC). @since 2018.Feb WinterEvent
+	var ff = d.api_friendly_battle;
+	var fi = d.api_friendly_info;
+	if (ff && fi) {
+		var t0 = ff.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'友軍照明弾(夜戦)',   at: t0, ae: 0, ff: 1});
+		calc_damage(result, "友軍艦隊", ff.api_hougeki, fi.api_nowhps.concat(), $e_prevhps || e_nowhps, null, 1);
+	}
 	if (d.api_touch_plane) {
 		// 触接(夜戦).
 		result.touch = d.api_touch_plane;
@@ -2651,13 +2658,6 @@ function on_battle(json, battle_api_name) {
 		// 照明弾発射(夜戦).
 		var t0 = d.api_flare_pos[0]; if (t0 != -1) result.detail.push({ty:'照明弾(夜戦)',   at: t0, ae: 0});
 		var t1 = d.api_flare_pos[1]; if (t1 != -1) result.detail.push({ty:'敵照明弾(夜戦)', at: t1, ae: 1});
-	}
-	// 友軍艦隊(NPC). @since 2018.Feb WinterEvent
-	var ff = d.api_friendly_battle;
-	var fi = d.api_friendly_info;
-	if (ff && fi) {
-		///@todo ff.api_flare_pos;
-		calc_damage(result, "友軍艦隊", ff.api_hougeki, fi.api_nowhps.concat(), $e_prevhps || e_nowhps, null, 1);
 	}
 	// calc_damage() の呼び出し順序は、下記資料の戦闘の流れに従っている.
 	// @see http://wikiwiki.jp/kancolle/?%C0%EF%C6%AE%A4%CB%A4%C4%A4%A4%A4%C6
