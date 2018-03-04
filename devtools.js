@@ -3349,6 +3349,14 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			}
 		};
 	}
+	else if (api_name == '/api_req_kaisou/slotset') {
+		var params = decode_postdata_params(request.request.postData.params);
+		var ship = $ship_list[params.api_id];
+		if (ship) {
+			ship.slot[params.api_slot_idx] = params.api_item_id;
+			print_port();
+		}
+	}
 	else if (api_name == '/api_req_kaisou/slot_exchange_index') {
 		// 改装:装備順番入れ替え.
 		func = function(json) { // 保有艦、艦隊一覧を更新してcond表示する.
