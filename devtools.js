@@ -3607,7 +3607,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			save_weekly();
 		}
 	}
-	else if (api_name == '/api_req_combined_battle/goback_port') {
+	else if (api_name == '/api_req_combined_battle/goback_port'
+		|| api_name == '/api_req_sortie/goback_port') {
 		// 護衛退避.
 		on_goback_port();
 	}
