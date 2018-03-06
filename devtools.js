@@ -1106,11 +1106,11 @@ function slotitem_delete(slot) {
 	});
 }
 
-function ship_delete(list, keep_slot) {
+function ship_delete(list, keep_slot, remove_ship) {
 	if (!list) return;
 	list.forEach(function(id) {
 		var f_id = $ship_fdeck[id];
-		if (f_id) {
+		if (f_id && remove_ship) {
 			var fleet_list = $fdeck_list[f_id].api_ship;
 			for (var idx in fleet_list) {
 				if (fleet_list[idx] == id) break;
@@ -3006,7 +3006,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) {
 			var dest = decode_postdata_params(request.request.postData.params).api_slot_dest_flag;
 			var ids = decode_postdata_params(request.request.postData.params).api_ship_id;
-			if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids], dest==0);	// 解体した艦娘を、リストから抜く.
+			if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids], dest==0, true);	// 解体した艦娘を、リストから抜く.
 			update_material(json.api_data.api_material, $material.destroyship); /// 解体による資材増加を記録する.
 			print_port();
 		};
@@ -3014,7 +3014,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_req_kaisou/powerup') {
 		// 近代化改修.
 		var ids = decode_postdata_params(request.request.postData.params).api_id_items;
-		if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids]);		// 素材として使った艦娘が持つ装備を、リストから抜く.
+		if (ids) ship_delete(/%2C/.test(ids) ? ids.split('%2C') : [ids], false, true);		// 素材として使った艦娘が持つ装備を、リストから抜く.
 		func = function(json) {
 			var d = json.api_data;
 			if (d.api_ship) delta_update_ship_list([d.api_ship]);
