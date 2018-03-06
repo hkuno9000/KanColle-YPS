@@ -1109,6 +1109,16 @@ function slotitem_delete(slot) {
 function ship_delete(list, keep_slot) {
 	if (!list) return;
 	list.forEach(function(id) {
+		var f_id = $ship_fdeck[id];
+		if (f_id) {
+			var fleet_list = $fdeck_list[f_id].api_ship;
+			for (var idx in fleet_list) {
+				if (fleet_list[idx] == id) break;
+			}
+			fleet_list.splice(idx, 1);
+			fleet_list.push(-1);
+		}
+		
 		var ship = $ship_list[id];
 		if (ship) {
 			if (!keep_slot) slotitem_delete(ship.slot);
