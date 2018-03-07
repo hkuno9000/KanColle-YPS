@@ -102,6 +102,9 @@ function Ship(data, ship) {
 	if (data.api_slot_ex > 0) {		// api_slot_ex:: 0:増設スロットなし, -1:増設スロット空,　1以上:増設スロット装備ID.
 		this.slot.push(data.api_slot_ex);
 	}
+	if (data.api_sally_area !== null) { // お札情報 イベント中限定 0: 札なし, 1～ : 各種札
+		this.sally_area = data.api_sally_area;
+	}
 }
 
 Ship.prototype.name_lv = function() {
@@ -1451,6 +1454,7 @@ function print_port() {
 	var drumcan_cond53 = [];
 	var drumcan_cond50 = [];
 	var drumcan_condxx = [];
+	var sally_area = {};
 	//
 	// ロック装備を種類毎に集計する.
 	for (var id in $slotitem_list) {
@@ -1535,6 +1539,13 @@ function print_port() {
 			});
 		}
 		if (ship.can_kaizou()) kaizou_list.push(ship);
+		if (ship.sally_area) {
+			if (sally_area[ship.sally_area]) {
+				sally_area[ship.sally_area].push(ship);
+			} else {
+				sally_area[ship.sally_area] = [ship];
+			}
+		}
 	}
 	unlock_names.reverse();	// 最新の艦を先頭にする.
 	var double_count = 0;
@@ -1709,6 +1720,22 @@ function print_port() {
 	}
 	msg.push('---');
 	if (msg.length > 2) req.push(msg);
+	
+	// お札のついた艦を表示する.
+	var sally_area_list = Object.keys(sally_area);
+	if (sally_area_list.length > 0) {
+		var msg = ['YPS_sally_area'];
+		msg.push('\t==札\t==艦名'); // 表ヘッダ
+		var title = [];
+		for (var area of sally_area_list) {
+			title.push('札' + area + ' ' + sally_area[area].length);
+			msg.push('\t札' + area + '\t|' + shiplist_names(sally_area[area]));
+		}
+		req.push('イベント限定: お札情報: ' + title.join(', '));
+		msg.push('---');
+		req.push(msg);
+	}
+	
 	//
 	// 入渠(修理)一覧表示する.
 	var ndocks = Object.keys($ndock_list).length;
