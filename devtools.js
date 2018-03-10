@@ -3168,6 +3168,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		update_fdeck_list($fdeck_list); // 編成結果を $ship_fdeck に反映する.
 		print_port();
 	}
+	else if (api_name == '/api_req_member/updatedeckname') {
+		// 艦隊名変更.
+		var params = decode_postdata_params(request.request.postData.params);
+		$fdeck_list[params.api_deck_id].api_name = unescape(params.api_name);
+		print_port();
+	}
 	else if (api_name == '/api_get_member/questlist') {
 		// 任務一覧.
 		func = function(json) { // 任務総数と任務リストを記録する.
