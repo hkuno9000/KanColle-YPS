@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v1.7.7 2018冬イベント対応2(友軍艦隊): 2018-02-19
+* v1.7.8 2018冬イベント対応3(札表示、単艦退避、連合第二ダメージ計算訂正), Chrome65対応: 2018-03-10
 * 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
