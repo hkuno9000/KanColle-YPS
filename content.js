@@ -134,6 +134,9 @@ function tooltip_span(a) {
 function update_tooltip() {
 	for (let e of document.getElementsByClassName('tooltip')) {
 		let pe = e.parentElement;
+		if (pe.tagName == 'TD') {
+			pe = pe.parentElement;
+		}
 		if (/toolmain/.test(pe.className)) continue;
 		pe.className += " toolmain"; // tooltipクラスの親ノードに、toolmainクラスを設定する.
 	}
