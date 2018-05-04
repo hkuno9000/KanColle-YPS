@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v1.8.0 任務一覧の表示方法改善: 2018-04-11
+* v1.8.1 ロック艦待機日数を一覧表示する: 2018-05-04
 * 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
