@@ -70,52 +70,52 @@ Flash PlayerはChrome内蔵のほうを使用してください
 6-5 | 3 | G:50
 
 ### 母港画面サンプル
-![port screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-port.png)
+![port screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-port.png)
 
 ### 戦況画面サンプル
-![battle screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-battle.png)
+![battle screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-battle.png)
 
 ### 戦闘詳報サンプル
-![battle screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-battle-detail.png)
+![battle screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-battle-detail.png)
 
 ### 羅針盤画面の大破進撃警告サンプル
-![battle screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-next-damage-alert.png)
+![battle screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-next-damage-alert.png)
 
 ### 帰港画面サンプル
-![battle screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-ret.png)
+![battle screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-ret.png)
 
 ### 資材収支表サンプル
-![battle screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-supply.png)
+![battle screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-supply.png)
 
 ### ロック艦一覧（cond降順)サンプル
-![locked ship screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-cond-list.png)
+![locked ship screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-cond-list.png)
 
 ### ロック装備一覧（改修中★とレベル数付)サンプル
-![locked slotitem screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-slotitem-list.png)
+![locked slotitem screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-slotitem-list.png)
 
 ### 改造、近代化改修可能艦一覧サンプル
-![kaizou screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-kaizou-list.png)
+![kaizou screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-kaizou-list.png)
 
 ### 修理中(入渠)、要修理艦一覧サンプル
-![kaizou screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-repair-list.png)
+![kaizou screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-repair-list.png)
 
 ### 改修工廠サンプル
-![remodel screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-remodel-slotitem.png)
+![remodel screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-remodel-slotitem.png)
 
 ### 未ロック、未保有、ダブリ艦一覧サンプル
-![unlock unown double screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-unlock-unown-double.png)
+![unlock unown double screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-unlock-unown-double.png)
 
 ### 次戦闘マス敵遭遇回数記録サンプル
-![next enemy count screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-next-enemy-count.png)
+![next enemy count screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-next-enemy-count.png)
 
 ### 遠征交代要員一覧サンプル
-![kira standby screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-kira-standby.png)
+![kira standby screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-kira-standby.png)
 
 ### 演習任務チェックサンプル
-![practice quest check screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-practice-quest-check.png)
+![practice quest check screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-practice-quest-check.png)
 
 ### 遠征任務チェックサンプル
-![practice quest check screenshot](http://hkuno9000.github.io/KanColle-YPS/images/YPS-mission-quest-check.png)
+![practice quest check screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-mission-quest-check.png)
 
 ## 注意事項
 * 大破進撃は自己責任でお願いします。
