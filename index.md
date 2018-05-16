@@ -1,9 +1,10 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v1.8.1 ロック艦待機日数を一覧表示する: 2018-05-04
+* v1.8.2 WebStore公開対応: 2018-05-16
 * 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
-* 最新版ダウンロード: [master.zip](https://github.com/hkuno9000/KanColle-YPS/archive/master.zip) , [master.tar.gz](https://github.com/hkuno9000/KanColle-YPS/archive/master.tar.gz)
+* 開発版ダウンロード: [master.zip](https://github.com/hkuno9000/KanColle-YPS/archive/master.zip) , [master.tar.gz](https://github.com/hkuno9000/KanColle-YPS/archive/master.tar.gz)
+* Chrome WebStore: [https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof](https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof)
 
 ## 開発コンセプト
 * 艦これの画面から目を離していても、ゲーム進行状況をすべて把握することが目的です。
@@ -12,21 +13,27 @@
 * 各艦毎の攻撃種別・使用装備・与ダメージを戦闘詳報として記録し、攻撃力検証に使えるようにします。
 * キラ付け、近代化改修、装備改修、熟練度など、ロックした艦と装備の全内容を一覧表示します。
 
-## インストール方法
-Flash PlayerはChrome内蔵のほうを使用してください
+## WebStore版と開発版の違い
+機能に違いはありません。
+バグ修正をしたり独自の改造を加えたい場合は開発版を、それ以外はWebStore版を使ってください。
 
+
+## WebStore版のインストール方法
+1. [Chrome WebStore](https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof) を開き、CHROMEに追加する.
+
+## 開発版のインストール方法
 1. ソースコード一式のZIPファイルをダウンロードし、適当なフォルダへ展開する
-1. または `git clone https://github.com/hkuno9000/KanColle-YPS.git`　でフォルダへ展開する
+1. または `git clone https://github.com/hkuno9000/KanColle-YPS.git` でフォルダへ展開する
 1. Google Chromeの拡張機能設定ページを開く(右肩の三本線→設定→左列の拡張機能)
 1. 【デベロッパー モード】にチェックを入れる
 1. 【パッケージ化されていない拡張機能を読み込む】ボタンを押して、ソース展開したフォルダを指定する(これで拡張機能がインストールされる)
+1. Google Chrome起動時に「デベロッパーモードの拡張機能を無効にする」とのメッセージボックスを「キャンセル」する.
+  * **「キャンセル」ではなく「無効にする」を選ぶと、このプラグインが無効化されてしまいます。**
 
-## バージョンアップ方法
+## 開発版のバージョンアップ方法
 1. ソース展開フォルダへZIPファイルの中身を上書き(または `git pull`)して、Chromeを再起動する.
 
 ## 使い方
-1. Google Chrome起動時に「デベロッパーモードの拡張機能を無効にする」とのメッセージボックスを「キャンセル」する.
-  * **「キャンセル」ではなく「無効にする」を選ぶと、このプラグインが無効化されてしまいます。**
 1. Google Chromeの【デベロッパー ツール】を起動する(右肩の三本線→その他のツール→デベロッパーツール)
   * **デベロッパーツールを起動させておかないと動作しません**
   * Opt+Cmd+I(Mac), Ctrl+Shift+I, F12 キーを押しても起動します。
