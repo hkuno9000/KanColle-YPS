@@ -77,6 +77,7 @@ var $enemy_formation = '';
 var $enemy_ship_names = [];
 var $log_daily = 0;
 var $kaizou_list_orig = null;
+var $convert_list_orig = null;
 
 //-------------------------------------------------------------------------
 // Ship クラス.
@@ -168,6 +169,15 @@ Ship.prototype.highspeed_repair = function() { ///< 高速修復.
 Ship.prototype.can_kaizou = function() {
 	var afterlv = $mst_ship[this.ship_id].api_afterlv;
 	return afterlv && afterlv <= this.lv;
+};
+
+Ship.prototype.can_convert = function() {
+	if(!this.can_kaizou()) {
+		return false;
+	}
+	var current = $mst_ship[this.ship_id]
+	var after = $mst_ship[current.api_aftershipid];
+	return after.api_aftershipid == this.ship_id && current.api_afterlv <= this.lv && after.api_afterlv <= this.lv;
 };
 
 Ship.prototype.max_kyouka = function() {
@@ -1498,6 +1508,7 @@ function print_port() {
 	var damage_L = 0;
 	var damage_N = 0;
 	var kaizou_list = [];
+	var convert_list = [];
 	var lockeditem_list = {};
 	var lockeditem_count = 0;
 	var $unlock_slotitem = 0;
@@ -1593,7 +1604,13 @@ function print_port() {
 				}
 			});
 		}
-		if (ship.can_kaizou()) kaizou_list.push(ship);
+		if (ship.can_kaizou()) {
+			if (ship.can_convert()) {
+				convert_list.push(ship);
+			} else {
+				kaizou_list.push(ship);
+			}
+		}
 		if (ship.sally_area) {
 			if (sally_area[ship.sally_area]) {
 				sally_area[ship.sally_area].push(ship);
@@ -1748,7 +1765,9 @@ function print_port() {
 	// 改造可能一覧、近代化改修一可能覧を表示する.
 	if ($kaizou_list_orig == null) $kaizou_list_orig = kaizou_list;
 	if ($kaizou_list_orig.length < kaizou_list.length) req.push('### @!!改造可能艦が増えました!!@'); // 警告表示.
-	req.push('改造可能艦数:' + kaizou_list.length
+	if ($convert_list_orig == null) $convert_list_orig = convert_list;
+	if ($convert_list_orig.length < convert_list.length) req.push('### @!!コンバート改装可能艦が増えました!!@'); // 警告表示.
+	req.push('改造可能艦数:' + (kaizou_list.length + convert_list.length)
 			+ ', 近代化改修可能艦数('
 			+   '火力:' + lock_kyoukalist[0].length
 			+ ', 雷装:' + lock_kyoukalist[1].length
@@ -1758,6 +1777,7 @@ function print_port() {
 			+ ')');
 	var msg = ['YPS_kai_list'];
 	if (kaizou_list.length > 0) msg.push('## 改造可能艦一覧', '\t|' + shiplist_names(kaizou_list));
+	if (convert_list.length > 0) msg.push('## コンバート改装可能艦一覧', '\t|' + shiplist_names(convert_list));
 	msg.push('## 近代化改修可能艦一覧(ロック艦のみ)');
 	var a = lock_kyoukalist[0]; if (a.length > 0) msg.push('### 火力', '\t|' + shiplist_names(a));
 	var a = lock_kyoukalist[1]; if (a.length > 0) msg.push('### 雷装', '\t|' + shiplist_names(a));
