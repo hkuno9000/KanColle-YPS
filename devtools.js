@@ -121,6 +121,10 @@ Ship.prototype.fleet_name_lv = function() {
 		return name;
 };
 
+Ship.prototype.fleet_name_lv_afterlv = function() {
+	return this.fleet_name_lv() + '(' + $mst_ship[this.ship_id].api_afterlv + ')';
+};
+
 Ship.prototype.kira_cond_diff_name = function() {
 	return kira_name(this.c_cond) + this.c_cond + diff_name(this.c_cond, this.p_cond);
 };
@@ -169,6 +173,11 @@ Ship.prototype.highspeed_repair = function() { ///< 高速修復.
 Ship.prototype.can_kaizou = function() {
 	var afterlv = $mst_ship[this.ship_id].api_afterlv;
 	return afterlv && afterlv <= this.lv;
+};
+
+Ship.prototype.will_kaizou = function() {
+	var afterlv = $mst_ship[this.ship_id].api_afterlv;
+	return afterlv && afterlv > this.lv;
 };
 
 Ship.prototype.can_convert = function() {
@@ -931,7 +940,8 @@ function ship_name(id) {
 	return to_string(id, "null");
 }
 
-function shiplist_names(list) {	// Shipの配列をlv降順に並べて、","区切りの艦名Lv文字列化する.
+function shiplist_names(list, method) {	// Shipの配列をlv降順に並べて、","区切りの艦名Lv文字列化する.
+	if (!method) method = 'fleet_name_lv';
 	list.sort(function(a, b) { return (b.lv == a.lv) ? a.id - b.id : b.lv - a.lv; }); // lv降順、同一lvならid昇順(古い順)でソートする.
 	var names = [];
 	var last = null;
@@ -941,7 +951,7 @@ function shiplist_names(list) {	// Shipの配列をlv降順に並べて、","区
 	}
 	for (var i in names) {
 		var e = names[i];
-		var name = e.ship.fleet_name_lv();	// "(艦隊N)艦名LvN"
+		var name = e.ship[method]();	// デフォルトは "(艦隊N)艦名LvN"
 		if (e.count > 1) name += "x" + e.count;	// 同一艦は x N で束ねる.
 		names[i] = name;
 	}
@@ -1509,6 +1519,7 @@ function print_port() {
 	var damage_N = 0;
 	var kaizou_list = [];
 	var convert_list = [];
+	var afterlv_list = [];
 	var lockeditem_list = {};
 	var lockeditem_count = 0;
 	var $unlock_slotitem = 0;
@@ -1610,6 +1621,8 @@ function print_port() {
 			} else {
 				kaizou_list.push(ship);
 			}
+		} else if (ship.locked && ship.will_kaizou()) {
+			afterlv_list.push(ship);
 		}
 		if (ship.sally_area) {
 			if (sally_area[ship.sally_area]) {
@@ -1776,6 +1789,7 @@ function print_port() {
 			+ ', 運:'   + lock_kyoukalist[4].length
 			+ ')');
 	var msg = ['YPS_kai_list'];
+	if (afterlv_list.length > 0) msg.push('## 次の改造レベル', '\t|' + shiplist_names(afterlv_list, 'fleet_name_lv_afterlv'));
 	if (kaizou_list.length > 0) msg.push('## 改造可能艦一覧', '\t|' + shiplist_names(kaizou_list));
 	if (convert_list.length > 0) msg.push('## コンバート改装可能艦一覧', '\t|' + shiplist_names(convert_list));
 	msg.push('## 近代化改修可能艦一覧(ロック艦のみ)');
