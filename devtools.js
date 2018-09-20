@@ -720,7 +720,7 @@ function boss_next_name() {
 	return '';
 }
 
-function slotitem_name(id, lv, alv, p_alv, n, max) {
+function slotitem_name(id, lv, alv, p_alv, n, max, distance) {
 	var item = $mst_slotitem[id];
 	if (!item) return id.toString();	// unknown slotitem.
 	var name = item.api_name;
@@ -733,6 +733,7 @@ function slotitem_name(id, lv, alv, p_alv, n, max) {
 		if (diff.length > 0) name += '@!!' + diff + '!!@';	// 熟練度変化量を追加する.
 	}
 	if (is_airplane(item) && n != null) name += (n == 0 && n < max) ? 'x0(@!!全滅!!@)' : 'x' + n + percent_name_unless100(n, max);	// 航空機なら、機数と搭載割合を追加する.
+	if (distance) name += ' 戦闘行動半径' + item.api_distance;	// 基地航空隊用
 	return name;
 }
 
@@ -3713,7 +3714,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 								'* '
 								+ get_squadron_name(pi.api_squadron_id) + ' '
 								+ (pi.api_state == 2 ? '配置転換中' : get_squadron_cond_name(pi.api_cond)) + ': '
-								+ slotitem_name(item.item_id, item.lv, item.alv, item.p_alv, pi.api_count, pi.api_max_count)
+								+ slotitem_name(item.item_id, item.lv, item.alv, item.p_alv, pi.api_count, pi.api_max_count, true)
 							);
 							if (pi.api_count != pi.api_max_count) {
 								charged = false;
