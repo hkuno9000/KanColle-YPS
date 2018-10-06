@@ -987,6 +987,7 @@ function battle_type_name(a, si) {
 	case 5: return '主徹カットイン';
 	case 6: return '主主カットイン';
 	case 7: return '戦爆連合カットイン';
+	case 100: return 'Nelson Touch';
 	default: return a; // 不明.
 	}
 }
