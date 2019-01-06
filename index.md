@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.6 2019冬イベント対応1: 2019-01-03
+* v2.1.6.1 2019冬イベント対応2: 2019-01-06
 * 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
@@ -70,11 +70,17 @@
 海域番号 | 分岐点係数 | 分岐マス名:外れ回避に必要な索敵スコア
 ---------|-----------:|-----------------|
 1-6 | 3 | M:30
-2-5 | 1 | H:33
-3-5 | 4 | G:28
+2-5 | 1 | G:41, I:34, J:49
+3-5 | 4 | G:28, H:41
+4-5 | 2 | K:71, Q:59
+5-2 | 2 | F:70
+5-4 | 1 | M:23, L:33
+5-5 | 1 | O:33, P:43
 6-1 | 4 | E:16, F:25
 6-2 | 3 | F:50, H:40
+6-3 | 3 | H:38
 6-5 | 3 | G:50
+7-2 | 4 | I:69
 
 ### 母港画面サンプル
 ![port screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-port.png)
