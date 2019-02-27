@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.7 2019冬イベント明け対応: 2019-01-31
+* v2.1.8 testing: 2019-02-28
 * 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
