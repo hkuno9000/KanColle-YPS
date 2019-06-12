@@ -1,10 +1,10 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.10.1 春イベント2019後段作戦(仮): 2019-05-31
-* 開発サイト: [https://github.com/hkuno9000/KanColle-YPS](https://github.com/hkuno9000/KanColle-YPS)
+* v2.1.10.2 春イベント2019後段作戦(仮2): 2019-06-12
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
+* 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
-* 開発版ダウンロード: [master.zip](https://github.com/hkuno9000/KanColle-YPS/archive/master.zip) , [master.tar.gz](https://github.com/hkuno9000/KanColle-YPS/archive/master.tar.gz)
-* Chrome WebStore: [https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof](https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof)
+* 開発者twitter: [https://twitter.com/hkuno9000](https://twitter.com/hkuno9000)
+* WebStore版インストーラ: [https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof](https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof)
 
 ## 開発コンセプト
 * 艦これの画面から目を離していても、ゲーム進行状況をすべて把握することが目的です。
@@ -37,6 +37,7 @@
 1. Google Chromeの【デベロッパー ツール】を起動する(右肩の三本線→その他のツール→デベロッパーツール)
   * **デベロッパーツールを起動させておかないと動作しません**
   * Opt+Cmd+I(Mac), Ctrl+Shift+I, F12 キーを押しても起動します。
+  * ツールのウィンドウは邪魔にならないように、右上肩の三本線＞Dock side＞画面下を選び、ウィンドウ境界をドラッグして最少サイズにします。
 1. Google Chromeで艦これにログインすると、画面右側に「艦これ余所見プレイ支援」と表示されます。
 1. 母港画面では、画面右側に「資材増減数、艦娘保有数、装備保有数、改造/近代化改修可能艦数、キラ付艦数、修理中、建造中、任務遂行数、艦隊１～４」の各メニューが表示されます。
 1. メニューの + ボタンをクリックすると詳細が表示されます。
