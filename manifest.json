@@ -20,7 +20,7 @@
 	},
 	"content_scripts": [
 		{
-			"matches": ["http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/"],
+			"matches": ["http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854*"],
 			"css": ["style-yps.css"],
 			"js": ["content.js"]
 		}
