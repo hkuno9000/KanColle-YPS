@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.15 演習、遠征任務カウンタ追加: 2019-10-12
+* v2.1.15.1 演習、遠征任務カウンタBugFix: 2019-11-09
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
