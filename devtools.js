@@ -182,9 +182,16 @@ Ship.prototype.will_kaizou = function() {
 };
 
 Ship.prototype.can_convert = function() {
-	var current = $mst_ship[this.ship_id]
-	var after = $mst_ship[current.api_aftershipid];
-	return after && after.api_aftershipid == this.ship_id && current.api_afterlv <= this.lv && after.api_afterlv <= this.lv;
+	for (var current = $mst_ship[this.ship_id]; current.api_aftershipid; current = after) {
+		var after = $mst_ship[current.api_aftershipid];
+		if (!after || current.api_afterlv > this.lv || after.api_afterlv > this.lv) {
+			return false;
+		}
+		if (after.api_aftershipid == this.ship_id) {
+			return true;
+		}
+	}
+	return false;
 };
 
 Ship.prototype.max_kyouka = function() {
