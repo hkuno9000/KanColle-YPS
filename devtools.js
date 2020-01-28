@@ -2263,6 +2263,9 @@ function on_mission_check(category) {
 	if (pending_category > 0) req.unshift('# @!!【警告】 未チェックの任務があります.!!@');
 	if (done_category > 0)    req.unshift('# @!!【警告】 達成済みの任務があります. クリアして追加の任務をチェックしましょう!!@');
 	if (req.length > 1) {
+		if (category == 5) {
+			push_ndock_list(req);
+		}
 		push_all_fleets(req);
 		chrome.runtime.sendMessage(req);
 	}
