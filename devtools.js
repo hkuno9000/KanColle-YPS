@@ -1557,7 +1557,6 @@ function print_port() {
 	var lock_kyoukalist = { 0:[], 1:[], 2:[], 3:[], 4:[] };
 	var lock_beginlist = {};
 	var lock_standby = {};
-	var lock_repairlist = [];
 	var unowned_names = [];
 	var owned_ship_idset = {};
 	$locked_ship_idset = {};
@@ -1566,10 +1565,6 @@ function print_port() {
 	var cond53 = 0;
 	var cond50 = 0;
 	var unlock_lv10 = 0;
-	var damage_H = 0;
-	var damage_M = 0;
-	var damage_L = 0;
-	var damage_N = 0;
 	var kaizou_list = [];
 	var convert_list = [];
 	var afterlv_list = [];
@@ -1637,14 +1632,6 @@ function print_port() {
 			var max_k = ship.max_kyouka();
 			for (var i in max_k) {
 				if (max_k[i] > ship.kyouka[i]) array_push(lock_kyoukalist, i, ship);
-			}
-			if (!$ndock_list[id] && ship.nowhp < ship.maxhp) {
-				var r = ship.nowhp / ship.maxhp;
-				if      (r <= 0.25) damage_H++; // 大破.
-				else if (r <= 0.50) damage_M++; // 中破.
-				else if (r <= 0.75) damage_L++; // 小破.
-				else                damage_N++; // 軽微.
-				lock_repairlist.push(ship);
 			}
 			if (!$ndock_list[id] && !$ship_fdeck[id] && slotitem_count(ship.slot, 75) > 0) { // ドラム缶装備の待機艦を選別する.
 				if     (cond >= 85) drumcan_cond85.push(ship);
@@ -1888,48 +1875,7 @@ function print_port() {
 	}
 	//
 	// 入渠(修理)一覧表示する.
-	var ndocks = Object.keys($ndock_list).length;
-	var repairs = lock_repairlist.length;
-	if (ndocks > 0 || repairs > 0) {
-		var msg = ['YPS_ndock_list'];
-		if (ndocks > 0) {
-			msg.push('## 修理中');
-			msg.push('\t==艦名Lv\t==燃料\t==弾薬\t==鋼材\t==ボーキ\t==完了時刻'); // 表ヘッダ.
-			var ndoklst = {};
-			for (var id in $ndock_list) {
-				var d = $ndock_list[id];
-				ndoklst[d.api_id] = id;
-			}
-			for (var i in ndoklst){
-				var id = ndoklst[i];
-				var d = $ndock_list[id];
-				var ship = $ship_list[id];
-				var c_date = new Date(d.api_complete_time);
-				msg.push('\t' + ship.fleet_name_lv()
-					+ '\t  ' + d.api_item1
-					+ '\t  ' + d.api_item2
-					+ '\t  ' + d.api_item3
-					+ '\t  ' + d.api_item4
-					+ '\t' + c_date.toLocaleString()
-					);
-			}
-		}
-		if (repairs > 0) {
-			msg.push('## 要修理(ロック艦のみ、修理時間降順)');
-			msg.push('\t==艦名Lv\t==hp\t==修理'); // 表ヘッダ.
-			lock_repairlist.sort(function(a, b) { return b.ndock_time - a.ndock_time; }); // 修理所要時間降順で並べ替える.
-			for (var i in lock_repairlist) {
-				var ship = lock_repairlist[i];
-				msg.push('\t' + ship.fleet_name_lv()
-					+ '\t' + hp_status(ship.nowhp, ship.maxhp)
-					+ '\t' + msec_name(ship.ndock_time)
-					);
-			}
-		}
-		req.push('修理中:' + ndocks + ', 要修理(大破' + damage_H + ', 中破' + damage_M + ', 小破' + damage_L + ', 軽微' + damage_N + ')');
-		req.push(msg);
-		msg.push('---');
-	}
+	push_ndock_list(req);
 	//
 	// 建造ドック一覧表示する.
 	var kdocks = Object.keys($kdock_list).length;
@@ -2152,6 +2098,67 @@ function push_quests(req) {
 		if (clear.length > 1) {
 			msg.push('クリア済', clear);
 		}
+		msg.push('---');
+	}
+}
+
+function push_ndock_list(req) {
+	var lock_repairlist = [];
+	var damage_H = 0;
+	var damage_M = 0;
+	var damage_L = 0;
+	var damage_N = 0;
+	for(var id in $ship_list) {
+		var ship = $ship_list[id];
+		if (ship.locked && !$ndock_list[id] && ship.nowhp < ship.maxhp) {
+			var r = ship.nowhp / ship.maxhp;
+			if      (r <= 0.25) damage_H++; // 大破.
+			else if (r <= 0.50) damage_M++; // 中破.
+			else if (r <= 0.75) damage_L++; // 小破.
+			else                damage_N++; // 軽微.
+			lock_repairlist.push(ship);
+		}
+	}
+	var ndocks = Object.keys($ndock_list).length;
+	var repairs = lock_repairlist.length;
+	if (ndocks > 0 || repairs > 0) {
+		var msg = ['YPS_ndock_list'];
+		if (ndocks > 0) {
+			msg.push('## 修理中');
+			msg.push('\t==艦名Lv\t==燃料\t==弾薬\t==鋼材\t==ボーキ\t==完了時刻'); // 表ヘッダ.
+			var ndoklst = {};
+			for (var id in $ndock_list) {
+				var d = $ndock_list[id];
+				ndoklst[d.api_id] = id;
+			}
+			for (var i in ndoklst){
+				var id = ndoklst[i];
+				var d = $ndock_list[id];
+				var ship = $ship_list[id];
+				var c_date = new Date(d.api_complete_time);
+				msg.push('\t' + ship.fleet_name_lv()
+					+ '\t  ' + d.api_item1
+					+ '\t  ' + d.api_item2
+					+ '\t  ' + d.api_item3
+					+ '\t  ' + d.api_item4
+					+ '\t' + c_date.toLocaleString()
+					);
+			}
+		}
+		if (repairs > 0) {
+			msg.push('## 要修理(ロック艦のみ、修理時間降順)');
+			msg.push('\t==艦名Lv\t==hp\t==修理'); // 表ヘッダ.
+			lock_repairlist.sort(function(a, b) { return b.ndock_time - a.ndock_time; }); // 修理所要時間降順で並べ替える.
+			for (var i in lock_repairlist) {
+				var ship = lock_repairlist[i];
+				msg.push('\t' + ship.fleet_name_lv()
+					+ '\t' + hp_status(ship.nowhp, ship.maxhp)
+					+ '\t' + msec_name(ship.ndock_time)
+					);
+			}
+		}
+		req.push('修理中:' + ndocks + ', 要修理(大破' + damage_H + ', 中破' + damage_M + ', 小破' + damage_L + ', 軽微' + damage_N + ')');
+		req.push(msg);
 		msg.push('---');
 	}
 }
