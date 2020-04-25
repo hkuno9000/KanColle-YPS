@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.19 ダブリ艦を名前に表示、艦隊分析対応: 2020-04-11
+* v2.1.20 デッキビルダー対応、比叡改二丙特殊攻撃対応: 2020-04-25
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
