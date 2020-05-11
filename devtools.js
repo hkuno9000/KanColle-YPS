@@ -2239,6 +2239,8 @@ function push_quests(req) {
 
 function push_ndock_list(req) {
 	var lock_repairlist = [];
+	var akashi_repairable = [];
+	var has_akashi = false;
 	var damage_H = 0;
 	var damage_M = 0;
 	var damage_L = 0;
@@ -2252,7 +2254,9 @@ function push_ndock_list(req) {
 			else if (r <= 0.75) damage_L++; // 小破.
 			else                damage_N++; // 軽微.
 			lock_repairlist.push(ship);
+			if (r > 0.50) akashi_repairable.push(ship);
 		}
+		if (!has_akashi && ship.name_lv().search(/明石/) >= 0) has_akashi = true;
 	}
 	var ndocks = Object.keys($ndock_list).length;
 	var repairs = lock_repairlist.length;
@@ -2279,6 +2283,20 @@ function push_ndock_list(req) {
 					+ '\t' + c_date.toLocaleString()
 					);
 			}
+		}
+		if (has_akashi && akashi_repairable.length > 0) {
+			var akashi = ['YPS_akashi_repairable'];
+			msg.push('## 明石修理候補早見');
+			akashi.push('\t==艦名Lv\t==hp\t==修理');
+			akashi_repairable.sort(function(a, b) { return b.ndock_time - a.ndock_time; });
+			for (var i in akashi_repairable) {
+				var ship = akashi_repairable[i];
+				akashi.push('\t' + ship.fleet_name_lv()
+					+ '\t' + hp_status(ship.nowhp, ship.maxhp)
+					+ '\t' + msec_name(ship.ndock_time)
+					);
+			}
+			msg.push(akashi);
 		}
 		if (repairs > 0) {
 			msg.push('## 要修理(ロック艦のみ、修理時間降順)');
