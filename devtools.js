@@ -214,6 +214,7 @@ Ship.prototype.can_convert = function() {
 		for (let after = $mst_ship[current.api_aftershipid]; after != null; after = $mst_ship[after.api_aftershipid]) {
 			if (after == current) return true;
 			if (checked[after.api_id]) break;
+			if (after.api_afterlv > this.lv) break;
 			checked[after.api_id] = true;
 		}
 	}
