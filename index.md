@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.26 bugfix: 2020-08-30
+* v2.1.27 晩秋〜冬イベント2020対応: 2020-12-16
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
