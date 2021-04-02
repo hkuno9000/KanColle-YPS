@@ -506,7 +506,7 @@ function update_mst_mission(list) {
 	$mst_mission_name_to_id = {};
 	list.forEach(function(data) {
 		$mst_mission[data.api_id] = data;
-		$mst_mission[data.api_name] = data.api_id;
+		$mst_mission_name_to_id[data.api_name] = data.api_id;
 	});
 	save_storage('mst_mission', $mst_mission);
 	save_storage('mst_mission_name_to_id', $mst_mission_name_to_id);
