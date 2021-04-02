@@ -3,6 +3,7 @@ var $mst_ship		= load_storage('mst_ship');
 var $mst_slotitem	= load_storage('mst_slotitem');
 var $mst_slotitemeq	= load_storage('mst_slotitemeq');
 var $mst_mission	= load_storage('mst_mission');
+var $mst_mission_name_to_id = load_storage('mst_mission_name_to_id');
 var $mst_useitem	= load_storage('mst_useitem');
 var $mst_mapinfo	= load_storage('mst_mapinfo');
 var $mst_maparea	= load_storage('mst_maparea');
@@ -502,10 +503,12 @@ function update_mst_slotitemeq(list) {
 function update_mst_mission(list) {
 	if (!list) return;
 	$mst_mission = {};
+	$mst_mission_name_to_id = {};
 	list.forEach(function(data) {
 		$mst_mission[data.api_id] = data;
 	});
 	save_storage('mst_mission', $mst_mission);
+	save_storage('mst_mission_name_to_id', $mst_mission_name_to_id);
 }
 
 function update_mst_useitem(list) {
@@ -2388,7 +2391,7 @@ function push_all_fleets(req) {
 			var rest = ms > 0 ? '残' + msec_name(ms) : '終了';
 			var id = deck.api_mission[1];
 			req.push('遠征' + $mst_mission[id].api_disp_no + ' ' + $mst_mission[id].api_name + ': ' + d.toLocaleString() + '(' + rest + ')');
-			$last_mission[f_id] = '前回遠征: ' + $mst_mission[id].api_name; // 支援遠征では /api_req_mission/result が来ないので、ここで事前更新しておく.
+			$last_mission[f_id] = '前回遠征: 遠征' + $mst_mission[id].api_disp_no + ' ' + $mst_mission[id].api_name; // 支援遠征では /api_req_mission/result が来ないので、ここで事前更新しておく.
 		}
 		else if (deck.api_id == $battle_deck_id) {
 			req.push('出撃中: ' + map_name());
@@ -3933,7 +3936,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 成功状況を記録する.
 			var d = json.api_data;
 			var id = decode_postdata_params(request.request.postData.params).api_deck_id;
-			$last_mission[id] = '前回遠征: ' + d.api_quest_name + ' ' + mission_clear_name(d.api_clear_result);
+			$last_mission[id] = '前回遠征: 遠征' + $mst_mission[$mst_mission_name_to_id[d.api_quest_name]].api_disp_no + ' ' + d.api_quest_name + ' ' + mission_clear_name(d.api_clear_result);
 			for (var i = 0; i < d.api_get_material.length; ++i) { // i=0..3 燃料からボーキーまで.
 				$material.mission[i]    += d.api_get_material[i];
 				$material.autosupply[i] -= d.api_get_material[i];	// 後続の /api_port/port にて自然増加に誤算入される分を補正する.
