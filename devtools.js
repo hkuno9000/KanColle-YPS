@@ -1425,6 +1425,16 @@ Daihatu.prototype.count_up = function(value) {
 		this.level += value.level;
 		this.sum++;
 		break;
+	case 408:	// 装甲艇(AB艇).
+		this.up += 2;
+		this.level += value.level;
+		this.sum++;
+		break;
+	case 409:	// 武装大発.
+		this.up += 3;
+		this.level += value.level;
+		this.sum++;
+		break;
 	}
 	if (value.ship_id == 487) { // 鬼怒改二.
 		this.up += 5;
