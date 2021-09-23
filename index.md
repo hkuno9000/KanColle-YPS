@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.31 夏イベント2021前段作戦対応: 2021-08-21
+* v2.1.32 夏イベント2021航空友軍対応(仮)、分岐係数訂正: 2021-09-23
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
@@ -73,16 +73,16 @@
 ---------|-----------:|-----------------|
 1-6 | 3 | M:30
 2-5 | 1 | G:41, I:34, J:49
-3-5 | 4 | G:28, H:41
-4-5 | 2 | K:71, Q:59
-5-2 | 2 | F:70
-5-4 | 1 | M:23, L:33
-5-5 | 1 | O:33, P:43
-6-1 | 4 | E:16, F:25
-6-2 | 3 | F:50, H:40
+3-5 | 4 | G:28, H:40
+4-5 | 2 | K:70, Q:59
+5-2 | 2 | F:70, L:62
+5-4 | 2 | M:45, L:60
+5-5 | 2 | O:66, P:80
+6-1 | 4 | G:16, H:25
+6-2 | 3 | E:50, H:32, I:40
 6-3 | 3 | H:38
-6-5 | 3 | G:50
-7-2 | 4 | I:69
+6-5 | 3 | G:50, J:35
+7-2 | 4 | E:46, I:69
 
 ### 母港画面サンプル
 ![port screenshot](https://hkuno9000.github.io/KanColle-YPS/images/YPS-port.png)
