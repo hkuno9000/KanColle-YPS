@@ -2997,6 +2997,7 @@ function calc_kouku_damage(result, title, kouku, fhp, ehp, active_deck, ff) {
 				ty: '対空カットイン(' + st.api_air_fire.api_kind + ')',
 				at: st.api_air_fire.api_idx,
 				ae: 0,
+				
 				si: st.api_air_fire.api_use_items,
 				ek: fraction_percent_name(st.api_e_lostcount, st.api_e_count),
 				fk: fraction_percent_name(st.api_f_lostcount, st.api_f_count)
