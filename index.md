@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.41 夏イベント2022後段作戦札対応: 2022-09-12
+* v2.1.42 service worker 無効対応: 2022-12-29
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
