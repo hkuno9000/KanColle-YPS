@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.1.47 夏イベント2023前段作戦対応: 2023-08-10
+* v2.1.48 夏イベント2023後段作戦対応(仮): 2023-08-27
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
@@ -36,7 +36,7 @@
 ## 使い方
 1. Google Chrome にて、「艦これ」にログインする.
 1. 艦これゲーム画面の「GAME START」をクリックする前に、Google Chromeの【デベロッパー ツール】を起動する. 起動方法は、
-  * Chrome右肩の三本線→その他のツール→デベロッパーツール.
+  * Chrome右肩の︙→その他のツール→デベロッパーツール.
   * または F12キー(MacOSではCmd+Option+I) を押す.
 1. デベロッパーツールがゲーム画面を圧迫しないように、ツールウィンドウ右上肩の三本線＞Dock side＞画面下を選び、ウィンドウ境界をドラッグして最少サイズにします.
 1. 艦これゲーム画面の「START GAME」をクリックする.
