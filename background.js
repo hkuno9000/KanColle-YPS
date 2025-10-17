@@ -1,7 +1,6 @@
 chrome.runtime.onMessage.addListener(function (req) {
 	chrome.tabs.query({url:[
-		'http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/',
-		'http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854'
+			'https://play.games.dmm.com/game/kancolle'
 		]}, function (tab) {
 		chrome.tabs.sendMessage(tab[0].id, req);
 	});
