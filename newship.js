@@ -225,7 +225,7 @@ $init_newship_slots = {
 565:	2,	// 福江.
 570:	2,	// 平戸.
 571:	2,	// Nelson.
-572:	undefined,	// Rodney.
+572:	2,	// Rodney.
 574:	3,	// Gotland.
 575:	1,	// Maestrale.
 581:	3,	// 日進.
@@ -275,27 +275,44 @@ $init_newship_slots = {
 885:	2,	// Victorious.
 886:	2,	// 早潮.
 891:	0,	// Salmon.
+892:	0,	// Drum.
 895:	2,	// 昭南.
 896:	1,	// Brooklyn.
 898:	1,	// 第二十二号海防艦.
 900:	2,	// 山汐丸.
-901:	undefined,	// Javelin.
+901:	1,	// Javelin.
 904:	2,	// 能美.
 905:	0,	// 倉橋.
 913:	2,	// Maryland.
 921:	2,	// 鵜来.
 922:	2,	// 稲木.
 923:	1,	// Tuscaloosa.
-924:	undefined,	// Nevada.
+924:	2,	// Nevada.
 925:	2,	// Langley.
+927:	2,	// Valiant.
 931:	3,	// Ranger.
 933:	2,	// Massachusetts.
-934:	undefined,	// C.Cappellini.
+934:	0,	// C.Cappellini.
 935:	1,	// Jean Bart.
 941:	2,	// Heywood L.E..
+942:	2,	// Richard P.Leary.
 943:	2,	// 熊野丸.
+944:	1,	// 平安丸.
 945:	0,	// 第百一号輸送艦.
+952:	1,	// Phoenix.
 953:	0,	// 朝日.
+962:	2,	// Mogador.
 964:	1,	// 白雲.
+965:	2,	// Gloire.
+966:	3,	// Lexington.
+971:	0,	// 伊36.
+972:	0,	// 伊41.
+984:	0,	// Wahoo.
+992:	1,	// 杉.
+994:	1,	// 榧.
+995:	2,	// 大泊.
+1001:	3,	// Киров.
+1003:	2,	// しまね丸.
+1005:	1,	// Minneapolis.
 9999:	null	// dummy
 };
