@@ -44,11 +44,17 @@ document.body.appendChild(deck_textarea);
 //------------------------------------------------------------------------
 // ゲーム画面の配置調整.
 //
-document.getElementById('w').style.textAlign = 'left';
-document.getElementById('w').style.width = '1230px';
+//document.getElementById('w').style.textAlign = 'left';
+//document.getElementById('w').style.width = '1230px';
 //document.getElementById('area-game').style.textAlign = 'left';
 //document.getElementById('game_frame').width = '820px';
 //document.getElementById('ntg-recommend').style.display = 'none';
+var root = document.getElementById('root');
+var grs = root.getElementsByClassName('gamesResetStyle')[0];
+// gamesResetStyle 直下の main タグの style を変更するほうが見た目にもバランス的にも良いが
+// SPA 化されているためこのあたりに記述して同期的実行する分には HTMLElement として拾えなかった
+grs.style.width = '820px';
+grs.style['margin-left'] = '30px';
 
 //------------------------------------------------------------------------
 // DOM制御.

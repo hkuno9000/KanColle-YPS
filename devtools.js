@@ -3477,7 +3477,9 @@ function on_battle(json, battle_api_name) {
 
 chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	var func = null;
-	var api_name = request.request.url.replace(/^http:\/\/[^\/]+\/kcsapi\//, '/');
+	// 2025/10/16-17 メンテ: APIもHTTPS化
+	var api_name = request.request.url.replace(/^https:\/\/[^\/]+\/kcsapi\//, '/');
+
 	if (api_name == request.request.url) {
 		// 置換失敗. api以外なので早抜けする.
 		return;
