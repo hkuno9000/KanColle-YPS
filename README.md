@@ -5,6 +5,7 @@
 * リリース履歴: https://github.com/hkuno9000/KanColle-YPS/releases
 * 開発者twitter: https://twitter.com/hkuno9000
 * WebStore版インストーラ: https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof
+* 開発版ZIPファイル: https://github.com/hkuno9000/KanColle-YPS/archive/refs/heads/master.zip
 
 ## 開発コンセプト
 * 艦これの画面から目を離していても、ゲーム進行状況をすべて把握することが目的です。
@@ -22,7 +23,7 @@
 1. [Chrome WebStore](https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof) を開き、CHROMEに追加する.
 
 ## 開発版のインストール方法
-1. ソースコード一式のZIPファイルをダウンロードし、適当なフォルダへ展開する
+1. [開発版ZIPファイル](https://github.com/hkuno9000/KanColle-YPS/archive/refs/heads/master.zip) をダウンロードし、適当なフォルダへ展開する
 1. または `git clone https://github.com/hkuno9000/KanColle-YPS.git` でフォルダへ展開する
 1. Google Chromeの拡張機能設定ページを開く(右肩の三本線→設定→左列の拡張機能)
 1. 【デベロッパー モード】にチェックを入れる
