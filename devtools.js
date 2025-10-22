@@ -2978,6 +2978,40 @@ function calc_damage(result, title, battle, fhp, ehp, active_deck, ff) {
 			}
 		}
 	}
+	if (battle.api_frai_list_items) {
+		// 自軍雷撃(複数ターゲット拡張版, 主に開幕雷撃):戦闘詳報収集.
+		for (var i = 0; i < battle.api_frai_list_items.length; ++i) {
+			var targets = battle.api_frai_list_items[i];
+			var damages = battle.api_fydam_list_items[i];
+			// targets damages は配列. 対象がない場合は null.
+			if (targets) {
+				for (var j = 0; j < targets.length; ++j) {
+					var target = targets[j];
+					var damage = damages[j];
+					var target_hp = (ehp_save[target] -= Math.floor(damage));
+					var at = i + fidx;      ///@todo check this
+					result.detail.push({ty:"雷撃", at: at, target: target, ae: 0, cl: battle_cl_name(battle.api_fcl_list_items[i][j]), damage: damage, hp: target_hp});
+				}
+			}
+		}
+	}
+	if (battle.api_erai_list_items) {
+		// 敵雷撃(複数ターゲット拡張版, 主に開幕雷撃):戦闘詳報収集.
+		for (var i = 0; i <= battle.api_erai_list_items.length; ++i) {
+			var targets = battle.api_erai_list_items[i];
+			var damages = battle.api_eydam_list_items[i];
+			// targets damages は配列. 対象がない場合は null.
+			if (targets) {
+				for (var j = 0; j < targets.length; ++j) {
+					var target = targets[j];
+					var damage = damages[j];
+					var target_hp = (fhp_save[target] -= Math.floor(damage));
+					var at = i + eidx;      ///@todo check this
+					result.detail.push({ty:"雷撃", at: at, target: target, ae: 1, cl: battle_cl_name(battle.api_ecl_list_items[i][j]), damage: damage, hp: target_hp});
+				}
+			}
+		}
+	}
 	if (battle.api_frai_flag && battle.api_fbak_flag) {
 		// 開幕航空戦:自軍被害詳報収集.
 		for (var i = 0; i < battle.api_fdam.length; ++i) {
