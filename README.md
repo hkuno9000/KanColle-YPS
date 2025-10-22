@@ -3,7 +3,10 @@
 * 公開サイト: https://hkuno9000.github.io/KanColle-YPS
 * 不具合報告先: https://github.com/hkuno9000/KanColle-YPS/issues
 * リリース履歴: https://github.com/hkuno9000/KanColle-YPS/releases
-* 開発者twitter: https://twitter.com/hkuno9000
+* 開発者X(旧twitter): https://x.com/hkuno9000
+  * ⚓#KanColleYPS の話題を
+    [ポストする](https://twitter.com/intent/tweet?hashtags=KanColleYPS,艦これYPS&text=⚓)
+    、[検索する](https://x.com/search?q=KanColleYPS&src=typed_query&f=live)
 * WebStore版インストーラ: https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof
 * 開発版ZIPファイル: https://github.com/hkuno9000/KanColle-YPS/archive/refs/heads/master.zip
 
