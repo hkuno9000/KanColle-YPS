@@ -133,6 +133,7 @@ function fixup_tooltip() {
 function parse_markdown(a) {
 	var html = "";
 	var li_count = 0;
+	var ul_count = 0;
 	var tr_count = 0;
 	for (var i = 0; i < a.length; ++i) {
 		var s = a[i];
@@ -191,8 +192,8 @@ function parse_markdown(a) {
 									  t = t.replace(/<td>==/g, '<th>'); // "\t==" はヘッダセル.
 									}
 		// リストを<ul>で括る.
-		if (li_count == 1) html += '<ul class="markdown">';
-		if (li_count > 0 && !/^<li>/.test(t)) { li_count = 0; html += "</ul>"; } 
+		if (ul_count == 0 && li_count == 1) { html += '<ul class="markdown">'; ul_count = 1; }
+		if (ul_count > 0 && li_count > 0 && !/^<li>/.test(t)) { li_count = 0; ul_count = 0; html += "</ul>"; } 
 		// テーブルを<table>で括る.
 		if (tr_count == 1) html += '<table class="markdown">';
 		if (tr_count > 0 && !/^<tr>/.test(t)) { tr_count = 0; html += "</table>"; } 
@@ -201,7 +202,7 @@ function parse_markdown(a) {
 		else   html += '<div>' + s + '</div>';
 	}
 	// リスト、テーブルの括り漏れに対処する.
-	if (li_count > 0) { html += "</ul>"; } 
+	if (ul_count > 0 || li_count > 0) { html += "</ul>"; } 
 	if (tr_count > 0) { html += "</table>"; } 
 	return html;
 }
