@@ -43,6 +43,8 @@ document.body.appendChild(deck_textarea);
 
 //------------------------------------------------------------------------
 // ゲーム画面の配置調整.
+//  ブラウザ画面横幅いっぱいに拡がるゲーム領域を必要最低限の横幅に絞ってブラウザ右側を空ける.
+//  この空いた場所へ yps-body を表示する.
 //
 //document.getElementById('w').style.textAlign = 'left';
 //document.getElementById('w').style.width = '1230px';
@@ -53,8 +55,7 @@ var root = document.getElementById('root');
 var grs = root.getElementsByClassName('gamesResetStyle')[0];
 // gamesResetStyle 直下の main タグの style を変更するほうが見た目にもバランス的にも良いが
 // SPA 化されているためこのあたりに記述して同期的実行する分には HTMLElement として拾えなかった
-grs.style.width = '820px';
-grs.style['margin-left'] = '30px';
+grs.style.width = '1290px'; // 必要最低横幅 max(game-header 1280px, game-main 1200px) + padding 10px
 
 //------------------------------------------------------------------------
 // DOM制御.

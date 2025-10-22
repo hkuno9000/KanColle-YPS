@@ -4,15 +4,15 @@
 .yps-body {
 	white-space: pre-wrap;
 	position: absolute;
-	top: 75px; /* NaviBar 39px + margin 20px + spacer 16px */
-	left: 1260px;
+	top: 64px; /* game-header 40px + margin 20px */
+	left: 1298px; /* game-header 1280px + padding 10px + margin 8px */
 }
 .yps-history {
 	background: silver;
 }
 .yps-navi {
 	white-space: nowrap;
-	top: 25px; /* NaviBar 39px + margin 20px - 9px - 25px */
+	top: 8px; /* margin 8px */
 }
 .yps-cliptext {
 	position: fixed;
