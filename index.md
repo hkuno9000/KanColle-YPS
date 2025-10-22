@@ -1,10 +1,14 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.2.0 https対応版: 2025-10-20
+* v2.2.1 https対応、配置調整版: 2025-10-22
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
-* 開発者twitter: [https://twitter.com/hkuno9000](https://twitter.com/hkuno9000)
+* 開発者X(旧twitter): [https://x.com/hkuno9000](https://x.com/hkuno9000)
+  * ⚓#KanColleYPS の話題を
+    [ポストする](https://twitter.com/intent/tweet?hashtags=KanColleYPS,艦これYPS&text=⚓)
+    、[検索する](https://x.com/search?q=KanColleYPS&src=typed_query&f=live)
 * WebStore版インストーラ: [https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof](https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof)
+* 開発版ZIPファイル: [https://github.com/hkuno9000/KanColle-YPS/archive/refs/heads/master.zip](https://github.com/hkuno9000/KanColle-YPS/archive/refs/heads/master.zip)
 
 ## 開発コンセプト
 * 艦これの画面から目を離していても、ゲーム進行状況をすべて把握することが目的です。
@@ -22,7 +26,7 @@
 1. [Chrome WebStore](https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof) を開き、CHROMEに追加する.
 
 ## 開発版のインストール方法
-1. ソースコード一式のZIPファイルをダウンロードし、適当なフォルダへ展開する
+1. [開発版ZIPファイル](https://github.com/hkuno9000/KanColle-YPS/archive/refs/heads/master.zip) をダウンロードし、適当なフォルダへ展開する
 1. または `git clone https://github.com/hkuno9000/KanColle-YPS.git` でフォルダへ展開する
 1. Google Chromeの拡張機能設定ページを開く(右肩の三本線→設定→左列の拡張機能)
 1. 【デベロッパー モード】にチェックを入れる
