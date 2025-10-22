@@ -3,9 +3,9 @@
 	"name": "KanColle-YPS",
 	"short_name": "KanColle-YPS",
 	"version": "2.2.0.1",
-	"version_name": "v2.2.0.1 https対応版 + refine yps-body layout",
+	"version_name": "v2.2.0.2 https対応版 + refine yps-body layout, home-url",
 	"description": "艦これの余所見プレイを支援する(cond_checker改造版)",
-	"homepage_url": "http://hkuno9000.github.io/KanColle-YPS/",
+	"homepage_url": "https://hkuno9000.github.io/KanColle-YPS/",
 	"icons": {
 		"16": "icons/icon16.png",
 		"48": "icons/icon48.png",

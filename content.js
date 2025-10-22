@@ -297,7 +297,8 @@ function copy_button() {
 
 function version_banner() {
 	var ver_name = chrome.runtime.getManifest().version_name;
-	return ' <a href="http://hkuno9000.github.io/KanColle-YPS/" target="KanColle-YPS-website">KanColle-YPS ' + ver_name + '</a>';
+	var home_url = chrome.runtime.getManifest().homepage_url;
+	return ' <a href="' + home_url + '" target="KanColle-YPS-website">KanColle-YPS ' + ver_name + '</a>';
 }
 
 //------------------------------------------------------------------------
