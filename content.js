@@ -192,11 +192,11 @@ function parse_markdown(a) {
 									  t = t.replace(/<td>==/g, '<th>'); // "\t==" はヘッダセル.
 									}
 		// リストを<ul>で括る.
-		if (li_count > 0 && !/^<li>/.test(t)) { li_count = 0; html += "</ul>"; } 
-		if (li_count == 1) html += '<ul class="markdown">';
+		if (li_count > 0 && !/^<li>/.test(t)) { li_count = 0; html += "</ul>"; }
+		else if (li_count == 1) html += '<ul class="markdown">';
 		// テーブルを<table>で括る.
-		if (tr_count > 0 && !/^<tr>/.test(t)) { tr_count = 0; html += "</table>"; } 
-		if (tr_count == 1) html += '<table class="markdown">';
+		if (tr_count > 0 && !/^<tr>/.test(t)) { tr_count = 0; html += "</table>"; }
+		else if (tr_count == 1) html += '<table class="markdown">';
 		// 変換結果をhtmlに格納する.
 		if (t) html += t;
 		else   html += '<div>' + s + '</div>';

@@ -3,7 +3,7 @@
 	"name": "KanColle-YPS",
 	"short_name": "KanColle-YPS",
 	"version": "2.2.1",
-	"version_name": "v2.2.1 https対応、配置調整版",
+	"version_name": "v2.2.1.#197-fix-done",
 	"description": "艦これの余所見プレイを支援する(cond_checker改造版)",
 	"homepage_url": "https://hkuno9000.github.io/KanColle-YPS/",
 	"icons": {
