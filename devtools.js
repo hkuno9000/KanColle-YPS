@@ -1209,6 +1209,7 @@ function battle_sp_name(a, si) {
 	case 200: return '夜間瑞雲カットイン';
 	case 400: return '大和突撃(3隻)';
 	case 401: return '大和突撃(2隻)';
+	case 1000: return '内火艇特殊攻撃';
 	default: return a; // 不明.
 	}
 }
