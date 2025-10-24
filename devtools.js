@@ -1178,6 +1178,7 @@ function battle_type_name(a, si) {
 	case 103: return 'Colorado斉射';
 	case 200: return '瑞雲立体攻撃';
 	case 201: return '海空立体攻撃';
+	case 302: return '潜水艦隊攻撃';
 	case 400: return '大和突撃(3隻)';
 	case 401: return '大和突撃(2隻)';
 	default: return a; // 不明.
@@ -1207,6 +1208,7 @@ function battle_sp_name(a, si) {
 	case 103: return 'Colorado斉射';
 	case 104: return '僚艦夜戦突撃';
 	case 200: return '夜間瑞雲カットイン';
+	case 302: return '潜水艦隊攻撃';
 	case 400: return '大和突撃(3隻)';
 	case 401: return '大和突撃(2隻)';
 	case 1000: return '内火艇特殊攻撃';
@@ -2915,6 +2917,26 @@ function calc_damage(result, title, battle, fhp, ehp, active_deck, ff) {
 				}
 				else if (/^僚艦夜戦/.test(ty)) {
 					if (j == 1) at += 1; // change to 2nd ship
+					result.flagship_at_type = ty;
+				}
+				else if (/^潜水艦隊攻撃/.test(ty)) {
+					// @see https://wikiwiki.jp/kancolle/%E5%A4%A7%E9%AF%A8#SpecialAttack
+					// 潜水艦隊攻撃が発動しているということは2-4番艦の中破以上の被害は多くとも1隻まで
+					if ( j == 1 ) {
+						if(fhp[at+1] / $f_maxhps[at+1] <= 0.5) { // 2番艦中破時は3番艦に
+							at += 2;
+						} else {
+							at += 1;
+						}
+					}
+					// TODO: 4番艦は潜水艦かどうかの確認も必要
+					if ( j == 2 ) {
+						if(fhp[at+3] / $f_maxhps[at+3] <= 0.5) { // 4番艦中破時は3番艦に
+							at += 2;
+						} else {
+							at += 3;
+						}
+					}
 					result.flagship_at_type = ty;
 				}
 				result.detail.push({ty: ty, at: at, target: target, ae: ae[i], ff: ff, si: si2, cl: battle_cl_name(cl[j]), damage: damage, hp: target_hp});
