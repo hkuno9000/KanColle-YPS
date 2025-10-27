@@ -1476,6 +1476,16 @@ Daihatu.prototype.count_up = function(value) {
 		this.level += value.level;
 		this.sum++;
 		break;
+	case 525 :	// 特四式内火艇.
+		this.up += 4;
+		this.level += value.level;
+		this.sum++;
+		break;
+	case 526:	// 特四式内火艇改.
+		this.up += 5;
+		this.level += value.level;
+		this.sum++;
+		break;
 	}
 	if (value.ship_id == 487) { // 鬼怒改二.
 		this.up += 5;
