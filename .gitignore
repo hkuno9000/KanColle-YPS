@@ -2,3 +2,7 @@ gh-pages/
 *.tmp
 *.bak
 *.zip
+tmp/
+fix/
+wk/
+wk.*/
