@@ -1,5 +1,5 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.2.1 https対応、配置調整版: 2025-10-22
+* v2.2.2. 2025秋イベント前段対応: 2025-10-30
 * 公開サイト: https://hkuno9000.github.io/KanColle-YPS
 * 不具合報告先: https://github.com/hkuno9000/KanColle-YPS/issues
 * リリース履歴: https://github.com/hkuno9000/KanColle-YPS/releases
