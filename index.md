@@ -1,11 +1,11 @@
 # 艦これ余所見プレイ支援 KanColleYPS
-* v2.2.1 https対応、配置調整版: 2025-10-22
+* v2.2.2. 2025秋イベント前段対応: 2025-10-30
 * 公開サイト: [https://hkuno9000.github.io/KanColle-YPS](https://hkuno9000.github.io/KanColle-YPS)
 * 不具合報告先: [https://github.com/hkuno9000/KanColle-YPS/issues](https://github.com/hkuno9000/KanColle-YPS/issues)
 * リリース履歴: [https://github.com/hkuno9000/KanColle-YPS/releases](https://github.com/hkuno9000/KanColle-YPS/releases)
 * 開発者X(旧twitter): [https://x.com/hkuno9000](https://x.com/hkuno9000)
   * ⚓#KanColleYPS の話題を
-    <a href="https://twitter.com/intent/tweet?hashtags=KanColleYPS,艦これYPS&text=⚓" target="_blank">ポストする</a>
+    [ポストする](https://twitter.com/intent/tweet?hashtags=KanColleYPS,艦これYPS&text=⚓)
     、[検索する](https://x.com/search?q=KanColleYPS&src=typed_query&f=live)
 * WebStore版インストーラ: [https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof](https://chrome.google.com/webstore/detail/kancolle-yps/fiidhnjbokehclfcglmpgpllfdpejgof)
 * 開発版ZIPファイル: [https://github.com/hkuno9000/KanColle-YPS/archive/refs/heads/master.zip](https://github.com/hkuno9000/KanColle-YPS/archive/refs/heads/master.zip)
