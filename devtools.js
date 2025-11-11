@@ -3438,6 +3438,9 @@ function on_battle(json, battle_api_name) {
 		if (d.api_n_support_flag) fmt += '+' + support_name(d.api_n_support_flag);
 		if (d.api_air_base_attack) fmt += '+基地航空隊';
 		if (result.flagship_at_type != null) fmt += '+' + result.flagship_at_type;
+		if (d.api_smoke_type) fmt += '+煙幕' + d.api_smoke_type;
+		if (d.api_balloon_cell) fmt += '+風船マス';
+		if (d.api_atoll_cell) fmt += '+環礁マス';
 		if (result.seiku != null) fmt += '/' + seiku_name(result.seiku);
 		$enemy_formation = formation_name(d.api_formation[1]);
 	}
