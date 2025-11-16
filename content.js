@@ -1,6 +1,8 @@
 //------------------------------------------------------------------------
 // DOM生成.
 //
+const ver_name = chrome.runtime.getManifest().version_name;
+const home_url = chrome.runtime.getManifest().homepage_url;
 var div = document.createElement('div');
 div.classList.add('yps-body');
 div.innerHTML = "艦これ余所見プレイ支援"
@@ -275,6 +277,16 @@ function copy_button() {
 			'https://noro6.github.io/kc-web#import:' + sim_info,
 			'YPS_sim');
 	};
+	$button_onclick["YPS_go_deck"] = function() {
+		event.preventDefault(); // 規定の動作を無効化する.
+		this.href = 'http://kancolle-calc.net/deckbuilder.html?predeck=' + predeck;
+		window.open(this.href, this.target);
+	};
+	$button_onclick["YPS_go_help"] = function() {
+		event.preventDefault(); // 規定の動作を無効化する.
+		this.href = home_url;
+		window.open(this.href, this.target);
+	};
 	$button_onclick["YPS_ship"] = function() {
 		ship_textarea.select();
 		document.execCommand('copy');
@@ -290,15 +302,13 @@ function copy_button() {
 	return ' <input id="YPS_sim" type="button" value="制空権シミュ"/>'
 		+ ' <input id="YPS_ship" type="button" value="艦娘情報Copy"/>'
 		+ ' <input id="YPS_slot" type="button" value="装備情報Copy"/>'
-		+ ' <a href ="http://kancolle-calc.net/deckbuilder.html?predeck=' + predeck + '" target="KanColle-YPS-to-deckbuilder">デッキビルダー</a>:'
+		+ ' <a href="http://kancolle-calc.net/deckbuilder.html" target="KanColle-YPS-to-deckbuilder" id="YPS_go_deck">デッキビルダー</a>:'
 		+ ' <input id="YPS_deck" type="button" value="艦隊情報Copy"/>'
 		;
 }
 
 function version_banner() {
-	var ver_name = chrome.runtime.getManifest().version_name;
-	var home_url = chrome.runtime.getManifest().homepage_url;
-	return ' <a href="' + home_url + '" target="KanColle-YPS-website">KanColle-YPS ' + ver_name + '</a>';
+	return ' <a href="' + home_url + '" target="KanColle-YPS-website" id="YPS_go_help">KanColle-YPS ' + ver_name + '</a>';
 }
 
 //------------------------------------------------------------------------
