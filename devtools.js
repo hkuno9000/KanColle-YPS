@@ -2571,6 +2571,11 @@ function on_next_cell(json) {
 		area += '(boss)';
 		$is_boss = true;
 	}
+	var seiku = ''; // print_next に紛れ込ませたいので事前に判定: 観察した限り戦闘マス以外では発生しない？
+	if (d.api_destruction_battle) { // 基地空襲の発生
+		seiku = seiku_name(d.api_destruction_battle.api_air_base_attack.api_stage1.api_disp_seiku);
+		$battle_log.push(area + '(基地空襲):' + seiku);
+	}
 	if (g) {	// 資源マス.
 		var msg = area;
 		if (g.api_id) g = [g];	// 航空偵察マスの時は配列ではない.
@@ -2649,6 +2654,13 @@ function on_next_cell(json) {
 			});
 			if (sum_ss > 0) {
 				req.push('### @!!潜水艦注意!!@ ' + fraction_percent_name(sum_ss, sum_all));
+			}
+		}
+		if(seiku) {
+			if(seiku.match(/優勢|確保/ui)) {
+				req.push('### 基地空襲の発生:@!!' + seiku + '!!@');
+			} else {
+				req.push('### 基地空襲の発生:' + seiku);
 			}
 		}
 		print_next('next enemy' + ($battle_count + 1) + boss_next_name() + ' ' + battle_kind_name(d.api_event_kind), req);
