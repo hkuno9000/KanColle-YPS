@@ -2575,10 +2575,13 @@ function on_next_cell(json) {
 		area += '(boss)';
 		$is_boss = true;
 	}
-	var seiku = ''; // print_next に紛れ込ませたいので事前に判定: 観察した限り戦闘マス以外では発生しない？
+	var seiku_notify = ''; // print_next に紛れ込ませたいので事前に判定: 戦闘マス・非戦闘マスでの発生を確認
 	if (d.api_destruction_battle) { // 基地空襲の発生
-		seiku = seiku_name(d.api_destruction_battle.api_air_base_attack.api_stage1.api_disp_seiku);
+		var seiku = seiku_name(d.api_destruction_battle.api_air_base_attack.api_stage1.api_disp_seiku);
 		$battle_log.push(area + '(基地空襲):' + seiku);
+		seiku_notify = seiku.match(/優勢|確保/ui) ?
+			('### 基地空襲の発生:@!!' + seiku + '!!@') :
+			('### 基地空襲の発生:' + seiku);
 	}
 	if (g) {	// 資源マス.
 		var msg = area;
@@ -2609,7 +2612,11 @@ function on_next_cell(json) {
 		var msg = area;
 		msg += ':' + (d.api_cell_flavor ? d.api_cell_flavor.api_message :  event_kind_name(d.api_event_kind));
 		$battle_log.push(msg);
-		print_next('next skip' + boss_next_name(), msg);
+		if(seiku_notify) {
+			print_next('next skip' + boss_next_name(), [msg, seiku_notify]);
+		} else {
+			print_next('next skip' + boss_next_name(), msg);
+		}
 	}
 	else if (d.api_event_id == 7 && d.api_event_kind == 0) { // 航空偵察マス.
 		var msg = area + ':航空偵察失敗';
@@ -2660,12 +2667,8 @@ function on_next_cell(json) {
 				req.push('### @!!潜水艦注意!!@ ' + fraction_percent_name(sum_ss, sum_all));
 			}
 		}
-		if(seiku) {
-			if(seiku.match(/優勢|確保/ui)) {
-				req.push('### 基地空襲の発生:@!!' + seiku + '!!@');
-			} else {
-				req.push('### 基地空襲の発生:' + seiku);
-			}
+		if(seiku_notify) {
+			req.push(seiku_notify);
 		}
 		print_next('next enemy' + ($battle_count + 1) + boss_next_name() + ' ' + battle_kind_name(d.api_event_kind), req);
 	}
