@@ -2942,6 +2942,10 @@ function calc_damage(result, title, battle, fhp, ehp, active_deck, ff) {
 					result.flagship_at_type = ty;
 				}
 				else if (/^僚艦夜戦/.test(ty)) {
+					// @see https://x.com/KanColle_STAFF/status/1277795234848489472 , https://posfie.com/@light_snow/p/HLlFu4z
+					if ($combined_flag && active_deck[0] == 2 && at == 0) {
+						at = 6; // データ側のバグで連合の第二艦隊が僚艦夜戦突撃を発動した際の攻撃艦情報に 0 が入っているのを補正.
+					}
 					if (j == 1) at += 1; // change to 2nd ship
 					result.flagship_at_type = ty;
 				}
