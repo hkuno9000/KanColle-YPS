@@ -2676,7 +2676,7 @@ function on_next_cell(json) {
 
 /// 護衛退避艦リストに艦IDを追加する. idx = 1..6, 7..12
 function add_ship_escape(idx) {
-	if ($combined_flag) {
+	if ($combined_flag && $battle_deck_id == 1) {
 		if (idx >= 7)
 			$ship_escape[$fdeck_list[2].api_ship[idx-7]] = 1; // 第ニ艦隊から退避.
 		else if (idx >= 1)
