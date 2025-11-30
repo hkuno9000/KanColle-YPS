@@ -324,6 +324,14 @@ chrome.runtime.onMessage.addListener(function (req) {
 		pop_history();
 		div.innerHTML += parse_markdown(req.appendData);
 	}
+	else if (req.interruptData) {
+		// 下に追加される appendData と異なり目立つ位置に割り込ませる
+		pop_history();
+		var temp = document.createElement('div');
+		temp.classList.add('yps-interrupt');
+		div.insertBefore(temp, document.getElementById(req.interruptData.key));
+		temp.innerHTML = parse_markdown(req.interruptData.value);
+	}
 	else if (req.ship_export_json) {
 		ship_textarea.innerText = req.ship_export_json;
 		slot_textarea.innerText = req.slot_export_json;
