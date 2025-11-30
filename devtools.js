@@ -4184,7 +4184,9 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					var ty = (evm && evm.api_gauge_type) ? evm.api_gauge_type : data.api_gauge_type;
 					var now = evm ? evm.api_now_maphp : data.api_defeat_count;
 					var max = evm ? evm.api_max_maphp : data.api_required_defeat_count;
-					mst.yps_opt_name = (ty == 3 ? 'TP' : ty == 2 ? 'HP' : '') + fraction_percent_name(now, max);
+					// 通常海域では 7-2 7-3 7-5 が複数ゲージだがデータ上区別できないので決め打ち
+					var gn = ((evm && evm.api_state == 1) || data.api_id == 72 || data.api_id == 73 || data.api_id == 75) ? data.api_gauge_num : 0;
+					mst.yps_opt_name = (gn ? gn + 'ゲージ目 ' : '') + (ty == 3 ? 'TP' : ty == 2 ? 'HP' : '') + fraction_percent_name(now, max);
 					uncleared.push('* ' + map_name(mst));
 				}
 			});
@@ -4251,7 +4253,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				var ty = evm.api_gauge_type;
 				var now = evm.api_now_maphp;
 				var max = evm.api_max_maphp;
-				mst.yps_opt_name = (ty == 3 ? 'TP' : ty == 2 ? 'HP' : '') + fraction_percent_name(now, max);
+				var gn = evm.api_gauge_num;
+				mst.yps_opt_name = (gn ? gn + 'ゲージ目 ' : '') + (ty == 3 ? 'TP' : ty == 2 ? 'HP' : '') + fraction_percent_name(now, max);
 			}
 		};
 	}
