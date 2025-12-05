@@ -60,6 +60,7 @@ var $battle_count = 0;
 var $ndock_list = {};
 var $do_print_port_on_ndock = false;
 var $do_print_port_on_slot_item = false;
+var $wait_gimmick_interruption = 0;
 var $kdock_list = {};
 var $battle_api_data = null;
 var $battle_deck_id = -1;
@@ -3568,6 +3569,34 @@ function on_battle(json, battle_api_name) {
   }
 }
 
+function on_mp3(url) {
+	var mp3_name = url.replace(/^https:\/\/[^\/]+\/kcs2\/resources\//, '/');
+
+	if(mp3_name == url) {
+		// se の mp3 以外なので早抜けする.
+		return;
+	}
+
+	// 解析: mp3 というより現在の状態と鳴ったタイミングについての解析
+	if(mp3_name == '/se/215.mp3') {
+		// 215.mp3 自体は主に任務達成・ギミック成功の se
+
+		// [撤退/帰還] port -> slot_item -> unsetslot -> useitem -> (215.mp3) の順
+		// useitem 終了時点で $wait_gimmick_interruption は 2 になっている
+		// 最短でも questlist -> clearitemget -> (215.mp3) と2手かかる任務達成の流れではここの処理は拾われない想定
+		// もっとガチガチにやるなら $prev_api_name のようなグローバル変数を用意すると良さそう
+		if($wait_gimmick_interruption) {
+			chrome.runtime.sendMessage({
+				interruptData: {
+					key: 'YPS_material',
+					value: ['### @!!ギミック達成音が鳴りました!!@']
+				}
+			});
+			$wait_gimmick_interruption = 0;
+		}
+	}
+}
+
 chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	var func = null;
 	// 2025/10/16-17 メンテ: APIもHTTPS化
@@ -3575,8 +3604,16 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 
 	if (api_name == request.request.url) {
 		// 置換失敗. api以外なので早抜けする.
+
+		// mp3 確認
+		on_mp3(request.request.url);
 		return;
 	}
+
+	if($wait_gimmick_interruption) {
+		--$wait_gimmick_interruption;
+	}
+	
 	// 時刻を得る.
 	$svDateTime = $pcDateTime = to_date(request.startedDateTime);	// PC側の日時(POST).
 	var h = request.response.headers;
@@ -4045,6 +4082,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				$last_mission[$battle_deck_id] = ['前回出撃: ' + log, msg];
 				$battle_deck_id = -1;
 				$do_print_port_on_slot_item = true;	// 戦闘直後の母港帰還時は、後続する slot_item で艦載機の熟練度が更新されるまで print_port() を遅延する.
+				$wait_gimmick_interruption = 5; // API呼び出し5回分ギミック達成判定を追う
 			}
 			else {
 				print_port();
