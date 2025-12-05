@@ -477,8 +477,12 @@ function update_mst_ship(list) {
 				before[a] = data.api_id;
 		}
 		const getmes = to_string(data.api_getmes);
-		if (getmes.replace('<br>', '').length > 0) // 未改装の艦種IDにのみ、取得時挨拶文があると想定した判定条件である.
-			begin[data.api_id] = true;
+		if (getmes.replace('<br>', '').length > 0) { // 未改装の艦種IDにのみ、取得時挨拶文があると想定した判定条件である. Glorious系統による例外あり #214
+			if(begin[data.api_id] !== false) {
+				begin[data.api_id] = true;
+			}
+			begin[data.api_aftershipid] = false;
+		}
 	});
 	for (let id in $mst_ship) {
 		let b = before[id];
