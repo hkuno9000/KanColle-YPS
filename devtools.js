@@ -11,6 +11,7 @@ var $ship_list		= load_storage('ship_list');
 var $slotitem_list	= load_storage('slotitem_list');
 var $remodel_slotlist = load_storage('remodel_slotlist');
 var $remodel_slotweek = load_storage('remodel_slotweek');
+var $useitem_list       = load_storage('useitem_list');
 var $enemy_db		= load_storage('enemy_db');
 var $weekly			= load_storage('weekly');
 var $quest_clear	= load_storage('quest_clear');
@@ -460,6 +461,15 @@ function update_slotitem_list(list) {
 	$slotitem_list = {};
 	add_slotitem_list(list, prev);
 	save_storage('slotitem_list', $slotitem_list);
+}
+
+function update_useitem_list(list) {
+	if(!list) return;
+	$useitem_list = {};
+	list.forEach(function(data) {
+		$useitem_list[data.api_id] = data;
+	});
+	save_storage('useitem_list', $useitem_list);
 }
 
 /// $mst_ship を list の内容で一新する.
@@ -3644,6 +3654,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 装備リストと建造リストを更新する.
 			update_slotitem_list(json.api_data.api_slot_item);
 			update_kdock_list(json.api_data.api_kdock);
+			update_useitem_list(json.api_data.api_useitem);
 		};
 	}
 	else if (api_name == '/api_get_member/slot_item') {
@@ -3655,6 +3666,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				print_port();
 			}
 		};
+	}
+	else if (api_name == '/api_get_member/useitem') {
+		// 保有アイテム
+		func = function(json) {
+			update_useitem_list(json.api_data); // 当面内部的な保有数の更新のみ
+		}
 	}
 	else if (api_name == '/api_get_member/kdock') {
 		// 建造一覧表(建造直後).
