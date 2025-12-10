@@ -2576,17 +2576,17 @@ function on_next_cell(json) {
 	var area = d.api_maparea_id + '-' + d.api_mapinfo_no + '-' + d.api_no;
 	$next_mapinfo = $mst_mapinfo[d.api_maparea_id * 10 + d.api_mapinfo_no];
 	$is_next = (d.api_next > 0);
-	if (d.api_event_id == 5) {
-		area += '(boss)';
-		$is_boss = true;
-	}
 	var seiku_notify = ''; // print_next に紛れ込ませたいので事前に判定: 戦闘マス・非戦闘マスでの発生を確認
 	if (d.api_destruction_battle) { // 基地空襲の発生
 		var seiku = seiku_name(d.api_destruction_battle.api_air_base_attack.api_stage1.api_disp_seiku);
 		$battle_log.push(area + '(基地空襲):' + seiku);
-		seiku_notify = seiku.match(/優勢|確保/ui) ?
+		seiku_notify = seiku.match(/優勢|確保/ui) && !$next_mapinfo.yps_cleared ?
 			('### 基地空襲の発生:@!!' + seiku + '!!@') :
 			('### 基地空襲の発生:' + seiku);
+	}
+	if (d.api_event_id == 5) {
+		area += '(boss)';
+		$is_boss = true;
 	}
 	if (g) {	// 資源マス.
 		var msg = area;
