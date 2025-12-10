@@ -3469,6 +3469,7 @@ function on_battle(json, battle_api_name) {
 		if (d.api_smoke_type) fmt += '+煙幕' + d.api_smoke_type;
 		if (d.api_balloon_cell) fmt += '+風船マス';
 		if (d.api_atoll_cell) fmt += '+環礁マス';
+		if (d.api_xal01) fmt += ($next_mapinfo.yps_cleared ? '+装甲破砕' : '+@!!装甲破砕!!@'); // クリア前のみ赤表示 / 夜戦時には xal01 フラグ自体がない
 		if (result.seiku != null) fmt += '/' + seiku_name(result.seiku);
 		$enemy_formation = formation_name(d.api_formation[1]);
 	}
@@ -4219,6 +4220,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				var evm = data.api_eventmap;
 				var mst = $mst_mapinfo[data.api_id];
 				mst.yps_opt_name = null;
+				mst.yps_cleared = data.api_cleared;
 				if (evm)
 					$mapinfo_rank[data.api_id] = evm.api_selected_rank;
 				if (!data.api_cleared || data.api_required_defeat_count) {
