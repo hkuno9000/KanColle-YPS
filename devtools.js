@@ -35,6 +35,7 @@ var $ship_escape = {};	// 護衛退避したshipidのマップ.
 var $mapinfo_rank = {};	// 海域難易度 undefined:なし, 1:丁, 2:丙, 3:乙, 4:甲.
 var $locked_ship_idset = {};	// ロック艦の艦種IDセット.
 var $locked_ship_double = {};	// ロック艦のダブリ順番号マップ. [艦固有ID] := 1:一隻目, 2:二隻目, 3:三隻目...
+var $all_ship_id_list = {};	// 艦種IDで引けるダブり艦固有ID(背番号)リスト. [艦種ID] := [艦固有ID1, 艦固有ID2 ...]
 var $next_mapinfo = null;
 var $next_enemy = null;
 var $is_boss = false;
@@ -1841,6 +1842,7 @@ function print_port() {
 	}
 	//
 	// ロック艦のcond別一覧、未ロック艦一覧、ロック装備持ち艦を検出する.
+	$all_ship_id_list = {}; // 更新前にリセット
 	for (var id in $ship_list) {
 		var ship = $ship_list[id];
 		var begin_id = ship.begin_shipid();
@@ -1883,6 +1885,7 @@ function print_port() {
 			else if (days <= 90) array_push(lock_standby, Math.ceil(days/10)*10, ship);
 			else                 array_push(lock_standby, '不明(90日以上)', ship);
 		}
+		array_push($all_ship_id_list, begin_id, ship.id);
 		// 制空権シミューレータ/艦隊分析用.
 		ship_export_info.push({
 			api_ship_id : ship.ship_id,
