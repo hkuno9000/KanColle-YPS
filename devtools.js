@@ -7,11 +7,13 @@ var $mst_mission_name_to_id = load_storage('mst_mission_name_to_id');
 var $mst_useitem	= load_storage('mst_useitem');
 var $mst_mapinfo	= load_storage('mst_mapinfo');
 var $mst_maparea	= load_storage('mst_maparea');
+var $mst_furniture	= load_storage('mst_furniture');
 var $ship_list		= load_storage('ship_list');
 var $slotitem_list	= load_storage('slotitem_list');
 var $remodel_slotlist = load_storage('remodel_slotlist');
 var $remodel_slotweek = load_storage('remodel_slotweek');
 var $useitem_list       = load_storage('useitem_list');
+var $furniture_list = load_storage('furniture_list');
 var $enemy_db		= load_storage('enemy_db');
 var $weekly			= load_storage('weekly');
 var $quest_clear	= load_storage('quest_clear');
@@ -472,6 +474,15 @@ function update_useitem_list(list) {
 	save_storage('useitem_list', $useitem_list);
 }
 
+function update_furniture_list(list) {
+	if(!list) return;
+	$furniture_list = {};
+	list.forEach(function(data) {
+		$furniture_list[data.api_id] = data;
+	});
+	save_storage('furniture_list', $furniture_list);
+}
+
 /// $mst_ship を list の内容で一新する.
 /// さらに改装情報として yps_before_shipid, yps_begin_shipid を設定する.
 function update_mst_ship(list) {
@@ -564,6 +575,15 @@ function update_mst_maparea(list) {
 		$mst_maparea[data.api_id] = data.api_name;
 	});
 	save_storage('mst_maparea', $mst_maparea);
+}
+
+function update_mst_furniture(list) {
+	if (!list) return;
+	$mst_furniture = {};
+	list.forEach(function(data) {
+		$mst_furniture[data.api_id] = data;
+	});
+	save_storage('mst_furniture', $mst_furniture);
 }
 
 function clear_quest_progress(id)
@@ -3641,6 +3661,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_mst_mission(json.api_data.api_mst_mission);
 			update_mst_mapinfo(json.api_data.api_mst_mapinfo);
 			update_mst_maparea(json.api_data.api_mst_maparea);
+			update_mst_furniture(json.api_data.api_mst_furniture);
 			sync_cloud();
 			chrome.runtime.sendMessage("## ロード完了");
 			debug_print_mst_slotitem();
@@ -3655,6 +3676,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_slotitem_list(json.api_data.api_slot_item);
 			update_kdock_list(json.api_data.api_kdock);
 			update_useitem_list(json.api_data.api_useitem);
+			update_furniture_list(json.api_data.api_furniture);
 		};
 	}
 	else if (api_name == '/api_get_member/slot_item') {
@@ -3671,6 +3693,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 保有アイテム
 		func = function(json) {
 			update_useitem_list(json.api_data); // 当面内部的な保有数の更新のみ
+		}
+	}
+	else if (api_name == '/api_get_member/furniture') {
+		// 保有家具
+		func = function(json) {
+			update_furniture_list(json.api_data); // 当面内部的な保有数の更新のみ
 		}
 	}
 	else if (api_name == '/api_get_member/kdock') {
