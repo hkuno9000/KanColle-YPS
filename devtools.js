@@ -3856,13 +3856,13 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_get_member/useitem') {
 		// 保有アイテム
 		func = function(json) {
-			update_useitem_list(json.api_data); // 当面内部的な保有数の更新のみ
+			update_useitem_list(json.api_data);
 		}
 	}
 	else if (api_name == '/api_get_member/furniture') {
 		// 保有家具
 		func = function(json) {
-			update_furniture_list(json.api_data); // 当面内部的な保有数の更新のみ
+			update_furniture_list(json.api_data);
 		}
 	}
 	else if (api_name == '/api_get_member/kdock') {
