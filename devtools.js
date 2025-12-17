@@ -2648,7 +2648,7 @@ function build_selection_support_table_md(reward_list, title, subtitle, dom_id) 
 	var cols = 1;
 
 	for(var idx in reward_list) {
-		if(cols < reward_list[idx].length) {
+		if(cols <= reward_list[idx].length) {
 			cols = reward_list[idx].length + 1; // 報酬選択肢の最大数+1
 		}
 	}
