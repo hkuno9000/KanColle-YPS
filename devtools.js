@@ -1280,6 +1280,7 @@ function get_squadron_name(sid) {
 
 function get_squadron_cond_name(cond) {
 	switch (cond) {
+	case 0: return '士気最大';
 	case 1: return '通常';
 	case 2: return '疲労';
 	case 3: return '赤疲労';
