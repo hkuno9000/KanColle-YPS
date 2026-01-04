@@ -6,6 +6,7 @@ var $mst_mission	= load_storage('mst_mission');
 var $mst_mission_name_to_id = load_storage('mst_mission_name_to_id');
 var $mst_useitem	= load_storage('mst_useitem');
 var $mst_mapinfo	= load_storage('mst_mapinfo');
+var $mst_mapinfo_no = load_storage('mst_mapinfo_no');
 var $mst_maparea	= load_storage('mst_maparea');
 var $ship_list		= load_storage('ship_list');
 var $slotitem_list	= load_storage('slotitem_list');
@@ -84,8 +85,10 @@ var $enemy_ship_names = [];
 var $log_daily = 0;
 var $kaizou_list_orig = null;
 var $convert_list_orig = null;
+// @see https://github.com/Nishisonic/QuestStateEx/blob/master/Quest.md 更新停止しているが(日)(週)程度の常設任務情報を参照するには十分
 $quest_complete_daily = {
 	210 : 10, // (日)敵艦隊を10回邀撃せよ！
+	226 : 5,  // (日)南西諸島海域の制海権を握れ！
 	303 : 3,  // (日)演習3回実施.
 	304 : 5,  // (日)演習5回勝利.
 	402 : 3,  // (日)遠征3回成功.
@@ -98,8 +101,14 @@ $quest_complete_daily = {
 	9999: null // dummy
 };
 $quest_complete_weekly = {
+	229 : 12, // (週)敵東方艦隊を撃滅せよ！ 任務名は敵東方, 海域は西方
+	241 : 5,  // (週)敵北方艦隊主力を撃滅せよ！
+	242 : 1,  // (週)敵東方中枢艦隊を撃破せよ！
+	243 : 2,  // (週)南方海域珊瑚諸島沖の制空権を握れ！ 5-2 S 2
+	261 : 3,  // (週)海上輸送路の安全確保に努めよ！ 1-5 A以上 3
 	302 : 20, // (週)大規模演習20回勝利.
 	404 : 30, // (週)大規模遠征30回成功.
+	411 : 7,  // (週)南方への鼠輸送を継続実施せよ! 東京急行系(遠征ID 37,38) 7
 	613 : 24, // (週)資源の再利用24回.
 	703 : 15, // (週)近代化改修15回.
 	9999: null // dummy
@@ -545,10 +554,13 @@ function update_mst_useitem(list) {
 function update_mst_mapinfo(list) {
 	if (!list) return;
 	$mst_mapinfo = {};
+	$mst_mapinfo_no = {};
 	list.forEach(function(data) {
 		$mst_mapinfo[data.api_id] = data;
+		array_push($mst_mapinfo_no, data.api_maparea_id, data.api_no);
 	});
 	save_storage('mst_mapinfo', $mst_mapinfo);
+	save_storage('mst_mapinfo_no', $mst_mapinfo_no);
 }
 
 function update_mst_maparea(list) {
@@ -2264,6 +2276,43 @@ function slotitem_levellist(mstid) {
 	}
 	if (list.length == 0) list.push(basename);
 	return list;
+}
+
+function is_current_sortie_map(area, no) {
+	// no は任意の * 、 より大きいを示す >N 等も許容
+	if(!$next_mapinfo) {
+		return false;
+	}
+	
+	var nums = $mst_mapinfo_no[area];
+	if(!no) {
+		no = '*';
+	}
+	if(no.match(/^>\d$/ui) ) {
+		var start = no.replace('>', '');
+		nums = nums.slice(start);
+	} else if(Array.isArray(no) ){
+		nums = no;
+	} else if(Number.isInteger(no)){
+		nums = [no];
+	}
+	for(var i = 0; i < nums.length; ++i) {
+		if(is_current_sortie_map_by_id([area, nums[i] ]) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function is_current_sortie_map_by_id(id) {
+	// id は配列 [area, no] 形式も許容
+	if(!$next_mapinfo) {
+		return false;
+	}
+	if(Array.isArray(id)) {
+		return $next_mapinfo.api_maparea_id == id[0] && $next_mapinfo.api_no == id[1];
+	}
+	return $next_mapinfo.api_id == id;
 }
 
 //------------------------------------------------------------------------
@@ -4165,7 +4214,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 成功状況を記録する.
 			var d = json.api_data;
 			var id = decode_postdata_params(request.request.postData.params).api_deck_id;
-			$last_mission[id] = '前回遠征: 遠征' + $mst_mission[$mst_mission_name_to_id[d.api_quest_name]].api_disp_no + ' ' + d.api_quest_name + ' ' + mission_clear_name(d.api_clear_result);
+			var mission_id = $mst_mission_name_to_id[d.api_quest_name];
+			$last_mission[id] = '前回遠征: 遠征' + $mst_mission[mission_id].api_disp_no + ' ' + d.api_quest_name + ' ' + mission_clear_name(d.api_clear_result);
 			for (var i = 0; i < d.api_get_material.length; ++i) { // i=0..3 燃料からボーキーまで.
 				$material.mission[i]    += d.api_get_material[i];
 				$material.autosupply[i] -= d.api_get_material[i];	// 後続の /api_port/port にて自然増加に誤算入される分を補正する.
@@ -4190,6 +4240,9 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				inc_quest_progress(402, w); // (日)遠征3回成功.
 				inc_quest_progress(403, w); // (日)遠征10回成功.
 				inc_quest_progress(404, w); // (週)大規模遠征30回成功.
+				if(mission_id == 37 || mission_id == 38) {
+					inc_quest_progress(411, w); // (週)南方への鼠輸送を継続実施せよ！
+				}
 			}
 			// 直後に /api_port/port パケットが来るので print_port() は不要.
 		};
@@ -4392,7 +4445,9 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) {
 			on_battle_result(json);
 			const r = json.api_data.api_win_rank;
-			const is_win = (r == 'S' || r == 'A' || r == 'B');
+			const is_winS = (r == 'S');
+			const is_winA = (is_winS || r == 'A');
+			const is_win = (is_winA || r == 'B');
 			const w = get_weekly();
 			// 敵艦隊を撃破せよ: 勝利ならば、任務状態を達成(3)に変更する.
 			if (is_win) clear_quest_progress(201);
@@ -4416,6 +4471,24 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					if (is_win) w.quest_progress[214].win_boss++;
 					w.savetime = 0;
 				}
+			}
+			if(is_win && $is_boss && is_current_sortie_map(2)) {
+				inc_quest_progress(226, w); // デイリー南西
+			}
+			if(is_win && $is_boss && is_current_sortie_map(4)) {
+				inc_quest_progress(229, w); // ウィークリー西方
+			}
+			if(is_win && $is_boss && is_current_sortie_map(3, '>2')) {
+				inc_quest_progress(241, w); // ウィークリー北方
+			}
+			if(is_win && $is_boss && is_current_sortie_map(4, 4)) {
+				inc_quest_progress(242, w); // ウィークリー4-4
+			}
+			if(is_winS && $is_boss && is_current_sortie_map(5, 2)) {
+				inc_quest_progress(243, w); // ウィークリー5-2
+			}
+			if(is_winA && $is_boss && is_current_sortie_map(1, 5)) {
+				inc_quest_progress(261, w); // ウィークリー1-5
 			}
 		};
 	}
