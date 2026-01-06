@@ -8,10 +8,13 @@ var $mst_useitem	= load_storage('mst_useitem');
 var $mst_mapinfo	= load_storage('mst_mapinfo');
 var $mst_mapinfo_no = load_storage('mst_mapinfo_no');
 var $mst_maparea	= load_storage('mst_maparea');
+var $mst_furniture	= load_storage('mst_furniture');
 var $ship_list		= load_storage('ship_list');
 var $slotitem_list	= load_storage('slotitem_list');
 var $remodel_slotlist = load_storage('remodel_slotlist');
 var $remodel_slotweek = load_storage('remodel_slotweek');
+var $useitem_list       = load_storage('useitem_list');
+var $furniture_list = load_storage('furniture_list');
 var $enemy_db		= load_storage('enemy_db');
 var $weekly			= load_storage('weekly');
 var $quest_clear	= load_storage('quest_clear');
@@ -33,6 +36,7 @@ var $ship_escape = {};	// 護衛退避したshipidのマップ.
 var $mapinfo_rank = {};	// 海域難易度 undefined:なし, 1:丁, 2:丙, 3:乙, 4:甲.
 var $locked_ship_idset = {};	// ロック艦の艦種IDセット.
 var $locked_ship_double = {};	// ロック艦のダブリ順番号マップ. [艦固有ID] := 1:一隻目, 2:二隻目, 3:三隻目...
+var $all_ship_id_list = {};	// 艦種IDで引けるダブり艦固有ID(背番号)リスト. [艦種ID] := [艦固有ID1, 艦固有ID2 ...]
 var $next_mapinfo = null;
 var $next_enemy = null;
 var $is_boss = false;
@@ -471,6 +475,24 @@ function update_slotitem_list(list) {
 	save_storage('slotitem_list', $slotitem_list);
 }
 
+function update_useitem_list(list) {
+	if(!list) return;
+	$useitem_list = {};
+	list.forEach(function(data) {
+		$useitem_list[data.api_id] = data;
+	});
+	save_storage('useitem_list', $useitem_list);
+}
+
+function update_furniture_list(list) {
+	if(!list) return;
+	$furniture_list = {};
+	list.forEach(function(data) {
+		$furniture_list[data.api_id] = data;
+	});
+	save_storage('furniture_list', $furniture_list);
+}
+
 /// $mst_ship を list の内容で一新する.
 /// さらに改装情報として yps_before_shipid, yps_begin_shipid を設定する.
 function update_mst_ship(list) {
@@ -570,6 +592,15 @@ function update_mst_maparea(list) {
 		$mst_maparea[data.api_id] = data.api_name;
 	});
 	save_storage('mst_maparea', $mst_maparea);
+}
+
+function update_mst_furniture(list) {
+	if (!list) return;
+	$mst_furniture = {};
+	list.forEach(function(data) {
+		$mst_furniture[data.api_id] = data;
+	});
+	save_storage('mst_furniture', $mst_furniture);
 }
 
 function clear_quest_progress(id)
@@ -1828,6 +1859,7 @@ function print_port() {
 	}
 	//
 	// ロック艦のcond別一覧、未ロック艦一覧、ロック装備持ち艦を検出する.
+	$all_ship_id_list = {}; // 更新前にリセット
 	for (var id in $ship_list) {
 		var ship = $ship_list[id];
 		var begin_id = ship.begin_shipid();
@@ -1870,6 +1902,7 @@ function print_port() {
 			else if (days <= 90) array_push(lock_standby, Math.ceil(days/10)*10, ship);
 			else                 array_push(lock_standby, '不明(90日以上)', ship);
 		}
+		array_push($all_ship_id_list, begin_id, ship.id);
 		// 制空権シミューレータ/艦隊分析用.
 		ship_export_info.push({
 			api_ship_id : ship.ship_id,
@@ -2565,6 +2598,154 @@ function push_all_fleets(req) {
 	}
 }
 
+/**
+ * questlist.api_select_rewards における api_kind を対応した報酬名称に変換する / kind は clearitemget.api_bounus.api_type の api_type とも対応
+ * @see https://www.eriri.org/upload/apilist.txt // Chrome で開くと Shift-JIS 判定されて文字化けするが中身は UTF-8
+ * 元は七四式電子観測儀のapilist.txtと思われるが、現行の74EN、岩川版のどちらとも異なる独自の修正・追記が多数加わっている
+ */
+function get_kind_name(kind) {
+	switch(kind) {
+	case 1: return '資源';
+	case 2: return '艦隊開放';
+	case 3: return '家具箱';
+	case 4: return '大型建造開放';
+	case 5: return '基地航空隊開放';
+	case 6: return '遠征臨時補給開放';
+	case 11: return '艦船';
+	case 12: return '装備';
+	case 13: return 'アイテム';
+	case 14: return '家具';
+	case 15: return '機種転換';
+	case 16: return '装備消費';
+	case 99: return 'イベント海域開放';
+	default: return '不明な報酬類別(' + kind + ')';
+	}
+}
+
+function get_mst_id_to_material_idx(mst_id) {
+	switch(mst_id) {
+	case 31: return 0; // 燃料
+	case 32: return 1; // 弾薬
+	case 33: return 2; // 鋼材
+	case 34: return 3; // ボーキサイト
+	case  2: return 4; // 高速建造材(バーナー)
+	case  1: return 5; // 高速修復材(バケツ)
+	case  3: return 6; // 開発資材(歯車・釘)
+	case  4: return 7; // 改修資材(ネジ)
+	default: return '不明な資源(' + mst_id + ')';
+	}
+}
+
+function get_reward_item_name(mst_id, kind, level) {
+	if(kind == 11) { // 艦船
+		var mst = $mst_ship[mst_id];
+		return mst ? mst.api_name : '不明な艦船(' + mst_id + ')';
+	} else if(kind == 12) { // 装備
+		var mst = $mst_slotitem[mst_id];
+		var name = mst ? mst.api_name : '不明な装備(' + mst_id + ')';
+		if(level) {
+			if(level >= 10) {
+				name += '★max';
+			} else {
+				name += ('★+' + level);
+			}
+		}
+		return name;
+	} else if(kind == 13) { // アイテム
+		if(mst_id > 900) {
+			return '装備運用枠';
+		}
+		var mst = $mst_useitem[mst_id];
+		return mst ? mst.api_name : '不明なアイテム(' + mst_id + ')';
+	} else if(kind == 14) { // 家具
+		var mst = $mst_furniture[mst_id];
+		return mst ? mst.api_title : '不明な家具(' + mst_id + ')'; // 家具は api_title
+	}
+	return '不明な報酬(' + mst_id + ')';
+}
+
+function get_reward_item_name_count_of_mine(mst_id, kind) {
+	if(kind == 11) {
+		var shiplist = $all_ship_id_list[mst_id];
+		return shiplist ?
+			shiplist_names(shiplist) :
+			get_reward_item_name(mst_id, kind) + '(未保有)';
+	} else if(kind == 12) {
+		return slotitem_levellist(mst_id).join(',');
+	} else if(kind == 13) {
+		var name = get_reward_item_name(mst_id, kind);
+		if(mst_id > 900) {
+			return name + 'x' + $max_slotitem;
+		}
+		if(Number.isInteger(get_mst_id_to_material_idx(mst_id))) {
+			return name + 'x' + $material.now[get_mst_id_to_material_idx(mst_id)]
+		}
+		var useitem = $useitem_list[mst_id];
+		return useitem ?
+			name + 'x' + useitem.api_count :
+			name + 'x0'; // 0個時は useitem が空
+	} else if(kind == 14) {
+		var name = get_reward_item_name(mst_id, kind);
+		var furniture = $furniture_list[mst_id];
+		return furniture ?
+			name + '(保有)' :
+			name + '(未保有)';
+	}
+	return get_reward_item_name(mst_id, kind); // その他はひとまず名前だけ取り出す
+}
+
+function translate_reward_info_to_item_names(info) {
+	// info: { api_no, api_kind, api_mst_id, api_slotitem_level, api_count }
+	var names = {};
+	names.kind = get_kind_name(info.api_kind);
+	names.item_name = get_reward_item_name(info.api_mst_id, info.api_kind, info.api_slotitem_level);
+	names.item_count = info.api_mst_id > 900 ? info.api_mst_id - 900 : info.api_count; // 装備運用枠は扱いが特殊: api_count は常に1 mst_id=901 は +1 902 は +2 ... と900番台の下位の数値分だけ保有枠が増加する
+	names.item_name_count_of_mine = get_reward_item_name_count_of_mine(info.api_mst_id, info.api_kind);
+	return names;
+}
+
+function build_selection_support_table_md(reward_list, title, subtitle, dom_id) {
+	var md = [dom_id];
+	var cols = 1;
+
+	for(var idx in reward_list) {
+		if(cols <= reward_list[idx].length) {
+			cols = reward_list[idx].length + 1; // 報酬選択肢の最大数+1
+		}
+	}
+	var header_row = [subtitle];
+	for(var i = 1; i < cols; ++i) {
+		header_row.push('選択報酬'+i);
+	}
+	md.push('\t=='+header_row.join('\t=='));
+
+	for(var idx in reward_list) {
+		var rw_set = reward_list[idx];
+		var row1 = ['選択肢'];
+		var row2 = ['手持ち'];
+		for(var i = 0; i < cols - 1; ++i) {
+			if(!rw_set[i]) { // 選択肢の数が揃っていなかった場合(2択と3択が混ざっていた場合)の埋め草
+				row1.push('');
+				row2.push('');
+				continue;
+			}
+			rw = rw_set[i];
+			var rw_names = translate_reward_info_to_item_names(rw);
+			// よく使うものは kind を省略
+			if(rw.api_kind == 11 || rw.api_kind == 12 || rw.api_kind == 13) {
+				row1.push(rw_names.item_name + 'x' + rw_names.item_count);
+				row2.push(rw_names.item_name_count_of_mine);
+			} else {
+				row1.push(rw_names.kind + ':' + rw_names.item_name + 'x' + rw_names.item_count);
+				row2.push(rw_names.kind + ':' + rw_names.item_name_count_of_mine);
+			}
+		}
+		md.push('\t'+row1.join('\t'));
+		md.push('\t'+row2.join('\t'));
+	}
+	return ['### ' + title, md];
+}
+
 //------------------------------------------------------------------------
 // イベントハンドラ.
 //
@@ -2574,6 +2755,7 @@ function on_mission_check(category) {
 	let done_category = 0;
 	var req = ['## 任務'];
 	const w = get_weekly();
+	let reward_list = ['## 達成した任務に選択報酬があります']; // hタグはじまりにして割り込み時も履歴に残さない挙動を維持
 	for (var id in $quest_list) {
 		var quest = $quest_list[id];
 		if (quest.api_state > 0) quests++;
@@ -2617,8 +2799,20 @@ function on_mission_check(category) {
 				}
 				q_type = '(他)'; break;
 			}
+			if(quest.api_select_rewards && quest.api_state == 3) {
+				var table = build_selection_support_table_md(
+					quest.api_select_rewards,
+					id + ':' + q_type + quest.api_title, // title
+					'任務' + id, // subtitle
+					'YPS_quest' + id + 'selection' // dom_id
+				);
+				reward_list = reward_list.concat(table);
+			}
 			req.push('\t' + progress + '\t' + id + ':' + q_type + quest.api_title);
 		}
+	}
+	if(reward_list.length > 1) {
+		req = reward_list.concat(req); // 先頭に追加
 	}
 	if (quests != $quest_count) req.unshift("### @!!任務リスト(全All)を開き、内容を更新してください!!@");
 	if (pending_category > 0) req.unshift('# @!!【警告】 未チェックの任務があります.!!@');
@@ -3700,6 +3894,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_mst_mission(json.api_data.api_mst_mission);
 			update_mst_mapinfo(json.api_data.api_mst_mapinfo);
 			update_mst_maparea(json.api_data.api_mst_maparea);
+			update_mst_furniture(json.api_data.api_mst_furniture);
 			sync_cloud();
 			chrome.runtime.sendMessage("## ロード完了");
 			debug_print_mst_slotitem();
@@ -3713,6 +3908,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 装備リストと建造リストを更新する.
 			update_slotitem_list(json.api_data.api_slot_item);
 			update_kdock_list(json.api_data.api_kdock);
+			update_useitem_list(json.api_data.api_useitem);
+			update_furniture_list(json.api_data.api_furniture);
 		};
 	}
 	else if (api_name == '/api_get_member/slot_item') {
@@ -3724,6 +3921,18 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				print_port();
 			}
 		};
+	}
+	else if (api_name == '/api_get_member/useitem') {
+		// 保有アイテム
+		func = function(json) {
+			update_useitem_list(json.api_data);
+		}
+	}
+	else if (api_name == '/api_get_member/furniture') {
+		// 保有家具
+		func = function(json) {
+			update_furniture_list(json.api_data);
+		}
 	}
 	else if (api_name == '/api_get_member/kdock') {
 		// 建造一覧表(建造直後).
