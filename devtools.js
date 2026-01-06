@@ -4214,7 +4214,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 成功状況を記録する.
 			var d = json.api_data;
 			var id = decode_postdata_params(request.request.postData.params).api_deck_id;
-			var mission_id = $mst_mission_name_to_id[d.api_quest_name];
+			const mission_id = $mst_mission_name_to_id[d.api_quest_name];
 			$last_mission[id] = '前回遠征: 遠征' + $mst_mission[mission_id].api_disp_no + ' ' + d.api_quest_name + ' ' + mission_clear_name(d.api_clear_result);
 			for (var i = 0; i < d.api_get_material.length; ++i) { // i=0..3 燃料からボーキーまで.
 				$material.mission[i]    += d.api_get_material[i];
@@ -4446,8 +4446,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			on_battle_result(json);
 			const r = json.api_data.api_win_rank;
 			const is_winS = (r == 'S');
-			const is_winA = (is_winS || r == 'A');
-			const is_win = (is_winA || r == 'B');
+			const is_winA = (r == 'S' || r == 'A');
+			const is_win = (r == 'S' || r == 'A' || r == 'B');
 			const w = get_weekly();
 			// 敵艦隊を撃破せよ: 勝利ならば、任務状態を達成(3)に変更する.
 			if (is_win) clear_quest_progress(201);
@@ -4462,7 +4462,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					w.quest_progress[214].sortie++;
 					w.savetime = 0;
 				}
-				if (r == 'S') { // S勝利数.
+				if (is_winS) { // S勝利数.
 					w.quest_progress[214].win_S++;
 					w.savetime = 0;
 				}
@@ -4472,23 +4472,13 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					w.savetime = 0;
 				}
 			}
-			if(is_win && $is_boss && is_current_sortie_map(2)) {
-				inc_quest_progress(226, w); // デイリー南西
-			}
-			if(is_win && $is_boss && is_current_sortie_map(4)) {
-				inc_quest_progress(229, w); // ウィークリー西方
-			}
-			if(is_win && $is_boss && is_current_sortie_map(3, '>2')) {
-				inc_quest_progress(241, w); // ウィークリー北方
-			}
-			if(is_win && $is_boss && is_current_sortie_map(4, 4)) {
-				inc_quest_progress(242, w); // ウィークリー4-4
-			}
-			if(is_winS && $is_boss && is_current_sortie_map(5, 2)) {
-				inc_quest_progress(243, w); // ウィークリー5-2
-			}
-			if(is_winA && $is_boss && is_current_sortie_map(1, 5)) {
-				inc_quest_progress(261, w); // ウィークリー1-5
+			if (is_win && $is_boss) { // ボス勝利.
+				if (is_current_sortie_map(2))       inc_quest_progress(226, w); // デイリー南西
+				if (is_current_sortie_map(4))       inc_quest_progress(229, w); // ウィークリー西方
+				if (is_current_sortie_map(3, '>2')) inc_quest_progress(241, w); // ウィークリー北方
+				if (is_current_sortie_map(4, 4))    inc_quest_progress(242, w); // ウィークリー4-4
+				if (is_winS && is_current_sortie_map(5, 2)) inc_quest_progress(243, w); // ウィークリー5-2
+				if (is_winA && is_current_sortie_map(1, 5)) inc_quest_progress(261, w); // ウィークリー1-5
 			}
 		};
 	}
