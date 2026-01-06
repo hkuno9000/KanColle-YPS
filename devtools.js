@@ -2352,6 +2352,13 @@ function push_quests(req) {
 			if (id == 212 && quest.yps_daily != w.daily) continue;	// 期限切れの"輸送艦5隻撃破"任務を非表示とする.
 			if (quest.api_state > 1) p_count.others++;
 			if (quest.api_state > 0) q_count.others++;
+			if(quest.api_label_type > 100) {
+				q_type = '(年' + (quest.api_label_type - 100) +'月-)'; // 101: 年1月- , 102: 年2月- ... 
+				break;
+			} else if(id != 211 && id != 212) {
+				q_type ='(季)';
+				break;
+			}
 			q_type = '(他)'; break;
 		}
 		if (quest.api_state > 0) quests++;
@@ -2601,6 +2608,13 @@ function on_mission_check(category) {
 				if (month_to_quarter(quest.yps_month) != month_to_quarter(w.month)) continue; // 期限切れ任務を非表示とする.
 				if (id == 211 && quest.yps_daily != w.daily) continue;	// 期限切れの"空母3隻撃破"任務を非表示とする.
 				if (id == 212 && quest.yps_daily != w.daily) continue;	// 期限切れの"輸送艦5隻撃破"任務を非表示とする.
+				if(quest.api_label_type > 100) {
+					q_type = '(年' + (quest.api_label_type - 100) + '月-)';
+					break;
+				} else if(id != 211 && id != 212) {
+					q_type = '(季)';
+					break;
+				}
 				q_type = '(他)'; break;
 			}
 			req.push('\t' + progress + '\t' + id + ':' + q_type + quest.api_title);
