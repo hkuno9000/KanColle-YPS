@@ -2321,7 +2321,7 @@ function is_current_sortie_map(area, no) {
 	if(!no) {
 		no = '*';
 	}
-	if(no.match(/^>\d$/ui) ) {
+	if(/^>\d$/.test(no)) {
 		var start = no.replace('>', '');
 		nums = nums.slice(start);
 	} else if(Array.isArray(no) ){
