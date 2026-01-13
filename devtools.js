@@ -323,6 +323,57 @@ Ship.prototype.next_level = function () {
 	return 'あと ' + this.nextlv;
 };
 
+Ship.prototype.get_ship_type = function () {
+	return $mst_ship[this.ship_id].api_stype;
+};
+
+Ship.prototype.is_ship_type = function (stype) {
+	return this.get_ship_type() == stype;
+}
+
+Ship.prototype.is_ship_type_in_array = function (stypes) {
+	if(!stypes) {
+		return false;
+	}
+	for(var i = 0; i < stypes.length; ++i) {
+		var stype = stypes[i];
+		if(this.is_ship_type(stype)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// ship_type(stype)から艦種への変換: 対応表も兼ねて 現在未使用
+// @see https://github.com/Nishisonic/logbook/blob/2929c70b87d981775e0ca9d36b45ecf3fca88530/script/questinfo.js
+function get_ship_type_name(stype) {
+	switch(stype) {
+	case 1: return '海防艦';
+	case 2: return '駆逐艦';
+	case 3: return '軽巡洋艦';
+	case 4: return '重雷装巡洋艦';
+	case 5: return '重巡洋艦';
+	case 6: return '航空巡洋艦';
+	case 7: return '軽空母';
+	case 8: return '巡洋戦艦(高速戦艦)';
+	case 9: return '戦艦';
+	case 10: return '航空戦艦';
+	case 11: return '正規空母';
+	//case 12: return '超弩級戦艦';
+	case 13: return '潜水艦';
+	case 14: return '潜水空母';
+	case 15: return '補給艦(敵)';
+	case 16: return '水上機母艦';
+	case 17: return '揚陸艦';
+	case 18: return '装甲空母';
+	case 19: return '工作艦';
+	case 20: return '潜水母艦';
+	case 21: return '練習巡洋艦';
+	case 22: return '補給艦';
+	default: return '艦種不明(' + stype + ')';
+	}
+}
+
 //------------------------------------------------------------------------
 // データ保存と更新.
 //
@@ -3225,9 +3276,13 @@ function calc_damage(result, title, battle, fhp, ehp, active_deck, ff) {
 							at += 1;
 						}
 					}
-					// TODO: 4番艦は潜水艦かどうかの確認も必要
 					if ( j == 2 ) {
-						if(fhp[at+3] / $f_maxhps[at+3] <= 0.5) { // 4番艦中破時は3番艦に
+						// 4番艦は潜水艦かどうかの確認も必要
+						const f_id = active_deck[0];
+						const s_id = $fdeck_list[f_id].api_ship[at+3];
+						const ship = $ship_list[s_id];
+						if(!ship.is_ship_type_in_array([13, 14]) // 4番艦が潜水艦・潜水空母以外のときは3番艦に
+						   || fhp[at+3] / $f_maxhps[at+3] <= 0.5) { // 4番艦中破時は3番艦に
 							at += 2;
 						} else {
 							at += 3;
