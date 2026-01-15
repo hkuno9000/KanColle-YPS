@@ -1751,8 +1751,11 @@ function push_fleet_status(msg, deck) {
 			var c_date = new Date(ndock.api_complete_time);
 			rp_str = '入渠' + ndock.api_id + ':' + c_date.toLocaleString();
 		}
+		var repair_msg = ship.repair_msg ? ship.repair_msg : '';
+		delete ship.repair_msg;
 		msg.push('\t' + ship.kira_cond_diff_name()
 			+ '\t' + ship.name_lv()
+			+ repair_msg
 			+ '\t' + hp_str
 			+ '\t' + rp_str
 			+ '\t' + ship.fuel_name()
@@ -4650,6 +4653,24 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = on_next_cell;
 	}
 	else if (api_name == '/api_req_map/next') {
+		// 旗艦大破時の進撃[ 要: ダメコン(応急修理要員・応急修理女神) ]
+		// 進撃を選んだ時点ではダメコンの消費はされず次の戦闘開始まで保留されている
+		// next 直前の ship_deck でも大破状態＋ダメコン未消費の旗艦情報が返ってくることも上記を裏付ける
+		// 戦闘マスに到達せず母港に戻った（もしくは艦これタブを閉じた）場合はダメコン消費なし＆元の大破時HPでの帰還となる
+		var params = decode_postdata_params(request.request.postData.params);
+		if(params.api_recovery_type > 0) {
+			var sid = $fdeck_list[$battle_deck_id].api_ship[0];
+			var ship = $ship_list[sid];
+			if(params.api_recovery_type == 1) {
+				slotitem_use(ship.slot, [42]);
+				ship.repair_msg = '!!修理要員発動';
+				ship.nowhp = Math.floor(ship.maxhp * 0.5); // 修理要員は 50% 回復(中破止まり)する.
+			} else if(params.api_recovery_type == 2) {
+				slotitem_use(ship.slot, [43]);
+				ship.repair_msg = '!!修理女神発動';
+				ship.nowhp = ship.maxhp; // 修理女神は 100% 回復する.
+			}
+		}
 		// 海域次戦陣形選択.
 		make_debug_ship_names();
 		func = on_next_cell;
