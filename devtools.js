@@ -78,6 +78,8 @@ var $e_prevhps = null;
 var $f_damage = 0;
 var $e_lost_count = 0;
 var $e_leader_lost = false;
+var $e_lost_position = {};
+var $e_lost_ship_type_count = {};
 var $e_combined = null;
 var $guess_win_rank = '?';
 var $guess_info_str = '';
@@ -92,7 +94,11 @@ var $convert_list_orig = null;
 // @see https://github.com/Nishisonic/QuestStateEx/blob/master/Quest.md 更新停止しているが(日)(週)程度の常設任務情報を参照するには十分
 $quest_complete_daily = {
 	210 : 10, // (日)敵艦隊を10回邀撃せよ！
+	211 : 3,  // (他)敵空母を3隻撃沈せよ！ 変則デイリー 日付の一の位が3,7,0の日のみ出現
+	212 : 5,  // (他)敵輸送船団を叩け！ 変則デイリー 日付の一の位が2,8の日のみ出現
+	218 : 3,  // (日)敵補給艦を3隻撃沈せよ！
 	226 : 5,  // (日)南西諸島海域の制海権を握れ！
+	230 : 6,  // (日)敵潜水艦を制圧せよ！
 	303 : 3,  // (日)演習3回実施.
 	304 : 5,  // (日)演習5回勝利.
 	402 : 3,  // (日)遠征3回成功.
@@ -105,6 +111,10 @@ $quest_complete_daily = {
 	9999: null // dummy
 };
 $quest_complete_weekly = {
+	213 : 20, // (週)海上通商破壊作戦 輸送20
+	220 : 20, // (週)い号作戦 空母20
+	221 : 50, // (週)ろ号作戦 輸送50
+	228 : 15, // (週)海上護衛戦 潜水15
 	229 : 12, // (週)敵東方艦隊を撃滅せよ！ 任務名は敵東方, 海域は西方
 	241 : 5,  // (週)敵北方艦隊主力を撃滅せよ！
 	242 : 1,  // (週)敵東方中枢艦隊を撃破せよ！
@@ -344,7 +354,7 @@ Ship.prototype.is_ship_type_in_array = function (stypes) {
 	return false;
 }
 
-// ship_type(stype)から艦種への変換: 対応表も兼ねて 現在未使用
+// ship_type(stype)から艦種への変換: 対応表も兼ねて
 // @see https://github.com/Nishisonic/logbook/blob/2929c70b87d981775e0ca9d36b45ecf3fca88530/script/questinfo.js
 function get_ship_type_name(stype) {
 	switch(stype) {
@@ -362,7 +372,7 @@ function get_ship_type_name(stype) {
 	//case 12: return '超弩級戦艦';
 	case 13: return '潜水艦';
 	case 14: return '潜水空母';
-	case 15: return '補給艦(敵)';
+	case 15: return '輸送艦'; // 敵補給艦 区別のため
 	case 16: return '水上機母艦';
 	case 17: return '揚陸艦';
 	case 18: return '装甲空母';
@@ -669,6 +679,19 @@ function inc_quest_progress(id, w) {
 		w = w || get_weekly();
 		if (w.quest_progress[id] == null) w.quest_progress[id] = 0; // dirty hack.
 		if (++w.quest_progress[id] >= complete) {
+			quest.api_state = 3;
+		}
+		w.savetime = 0; // calling save_weekly()
+	}
+}
+
+function inc_quest_progressN(id, w, n) {
+	const quest = $quest_list[id];
+	const complete = $quest_complete_daily[id] || $quest_complete_weekly[id];
+	if (complete && quest && quest.api_state == 2) {
+		w = w || get_weekly();
+		inc_number(w.quest_progress, id, n);
+		if (w.quest_progress[id] >= complete) {
 			quest.api_state = 3;
 		}
 		w.savetime = 0; // calling save_weekly()
@@ -3106,6 +3129,7 @@ function on_battle_result(json) {
 		// api_req_practice/battle_result 「演習戦闘結果」JSONでは api_dests, api_destsf が存在しないので、推定計算の値を使う.
 		var e_lost_count  = (d.api_dests != null) ? d.api_dests : $e_lost_count;
 		var e_leader_lost = (d.api_destsf != null) ? d.api_destsf : $e_leader_lost;
+		var e_lost_ship_type_count = {};
 		if (d.api_ship_id) {
 			var total = count_unless(d.api_ship_id, -1);
 			if ($e_combined) {
@@ -3113,6 +3137,18 @@ function on_battle_result(json) {
 			}
 			msg += '(' + e_lost_count + '/' + total + ')';
 			if (rank == 'S' && $f_damage == 0) rank = '完S';
+			var ship_id = d.api_ship_id;
+			if($e_combined) {
+				ship_id = ship_id.concat($e_combined);
+			}
+			for(var i = 0; i < ship_id.length; ++i) {
+				if(!$e_lost_position[i]) continue;
+				var s_id = ship_id[i]; // 敵の艦船ID マスターの側
+				var ship = $mst_ship[s_id];
+				var ship_type = ship.api_stype;
+				inc_number(e_lost_ship_type_count, ship_type, 1);
+			}
+			$e_lost_ship_type_count = e_lost_ship_type_count;
 		}
 		req.push(msg + ':' + rank);
 //		$guess_info_str += ', f_lost:' + count_if(lost, 1); // 自轟沈数.
@@ -3188,6 +3224,13 @@ function on_battle_result(json) {
 		var id = $fdeck_list[2].api_ship[mvp_c-1];
 		var ship = $ship_list[id];
 		req.push('MVP: ' + ship.name_lv() + ' +' + d.api_get_ship_exp_combined[mvp_c] + 'exp');
+	}
+	if(Object.keys(e_lost_ship_type_count).length) {
+		var e_lost_ship_detail = '敵撃破:';
+		for(stype in e_lost_ship_type_count) { // 連想配列のキーとして取り出すと文字列が得られる
+			e_lost_ship_detail += ' ' + get_ship_type_name(parseInt(stype, 10)) + 'x' + e_lost_ship_type_count[stype];
+		}
+		req.push(e_lost_ship_detail);
 	}
 	if (d.api_landing_hp) {
 		var p = d.api_landing_hp;
@@ -3507,6 +3550,7 @@ function guess_win_rank(f_nowhps, f_maxhps, f_beginhps, e_nowhps, e_maxhps, e_be
 	var e_count = 0;
 	var e_lost_count = 0;
 	var e_leader_lost = false;
+	var e_lost_position = {};
 	for (var i = 0; i < f_maxhps.length; ++i) {
 		// 友軍被害集計.
 		if (f_maxhps[i] == -1) continue;
@@ -3529,12 +3573,14 @@ function guess_win_rank(f_nowhps, f_maxhps, f_beginhps, e_nowhps, e_maxhps, e_be
 		e_hp_total += e_beginhps[i];
 		if (n <= 0) {
 			++e_lost_count;
+			e_lost_position[i] = true;
 			if(i == 0) e_leader_lost = true;
 		}
 	}
 	$f_damage = f_damage_total;
 	$e_lost_count = e_lost_count;
 	$e_leader_lost = e_leader_lost;
+	$e_lost_position = e_lost_position; // 戦闘時点では敵艦の撃破数はデータ上確定しないためresultに引き継ぐ
 	// %%% CUT HERE FOR TEST %%%
 	var f_damage_percent = Math.floor(100 * f_damage_total / f_hp_total); // 自ダメージ百分率. 小数点以下切り捨て.
 	var e_damage_percent = Math.floor(100 * e_damage_total / e_hp_total); // 敵ダメージ百分率. 小数点以下切り捨て.
@@ -3651,8 +3697,8 @@ function on_battle(json, battle_api_name) {
 		});
 	}
 	$e_combined = null;
-	if (d.api_e_maxhps_combined) {
-		$e_combined = d.api_e_maxhps_combined;
+	if (d.api_ship_ke_combined) {
+		$e_combined = d.api_ship_ke_combined;
 	}
 	// 友軍艦隊(NPC). @since 2018.Feb WinterEvent
 	var ff = d.api_friendly_battle;
@@ -4757,6 +4803,25 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				if (is_current_sortie_map(4, 4))    inc_quest_progress(242, w); // ウィークリー4-4
 				if (is_winS && is_current_sortie_map(5, 2)) inc_quest_progress(243, w); // ウィークリー5-2
 				if (is_winA && is_current_sortie_map(1, 5)) inc_quest_progress(261, w); // ウィークリー1-5
+			}
+			if(Object.keys($e_lost_ship_type_count).length) {
+				if($e_lost_ship_type_count[7] || $e_lost_ship_type_count[11]) { // 軽空母, 正規空母
+					var num = to_number($e_lost_ship_type_count[7]) + to_number($e_lost_ship_type_count[11]);
+					inc_quest_progressN(211, w, num); // 変則デイリー空母3
+					inc_quest_progressN(220, w, num); // い号 ウィークリー空母20
+				}
+				if($e_lost_ship_type_count[13]) { // 潜水 潜水空母(14)は今のところ敵には不在なので省略
+					var num = $e_lost_ship_type_count[13];
+					inc_quest_progressN(228, w, num); // ウィークリー潜水15
+					inc_quest_progressN(230, w, num); // デイリー潜水6
+				}
+				if($e_lost_ship_type_count[15]) { // 輸送艦 補給艦(22)も同様に省略
+					var num = $e_lost_ship_type_count[15];
+					inc_quest_progressN(212, w, num); // 変則デイリー輸送5 ※ 212 218 が同時に出現した際、艦これ本体側に撃破数の判定がおかしくなるバグが存在するが対応しない
+					inc_quest_progressN(213, w, num); // ウィークリー輸送20
+					inc_quest_progressN(218, w, num); // デイリー輸送3
+					inc_quest_progressN(221, w, num); // ろ号 ウィークリー輸送50
+				}
 			}
 		};
 	}
