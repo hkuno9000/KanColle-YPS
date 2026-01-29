@@ -2876,7 +2876,9 @@ function on_mission_check(category) {
 				}
 				q_type = '(他)'; break;
 			}
-			if(quest.api_select_rewards && quest.api_state == 3) {
+			// 工廠系を中心に手持ちの装備・アイテムの個数をクライアント側でチェックするタイプの任務は
+			// api_state=2 かつ api_select_rewards が存在する状態でクリア判定になることがある
+			if(quest.api_select_rewards && quest.api_state > 1) {
 				var table = build_selection_support_table_md(
 					quest.api_select_rewards,
 					id + ':' + q_type + quest.api_title, // title
