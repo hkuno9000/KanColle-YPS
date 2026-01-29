@@ -2713,6 +2713,24 @@ function get_mst_id_to_material_idx(mst_id) {
 	}
 }
 
+// mst_id ごとに異なる戦果が割り振られている
+// 900番台の装備保有枠のような法則性は見受けられないためベタ書き
+// 他、常設任務では 
+//  ・ 改装特務空母「Gambier Bay Mk.II」抜錨！(戦果+800)
+// 期間限定任務では 
+//  ・ 【節分任務:柊】節分拡張作戦二〇二五 五穀豊穣！(戦果+50)
+//  ・ 【節分任務:枡】節分演習！二〇二五(戦果+11)
+//  ・ 【梅雨限定月間任務】西方海域統合作戦2025(戦果+440)
+// などが存在する模様
+// 900に近付いていることを考慮すると近日中に装備保有枠の採番がリセットされる可能性もありそう
+function get_mst_id_to_rate(mst_id) {
+	switch(mst_id) {
+	case: 893: return 12; // 329:(日)【節分任務:枡】節分演習！二〇二六
+	case: 894: return 60; // 843:(週)【節分任務:柊】節分拡張作戦二〇二六、重巡出撃！
+	default: return '不明な戦果(' + mst_id + ')';
+	}
+}
+
 function get_reward_item_name(mst_id, kind, level) {
 	if(kind == 11) { // 艦船
 		var mst = $mst_ship[mst_id];
@@ -2733,7 +2751,13 @@ function get_reward_item_name(mst_id, kind, level) {
 			return '装備運用枠';
 		}
 		var mst = $mst_useitem[mst_id];
-		return mst ? mst.api_name : '不明なアイテム(' + mst_id + ')';
+		if(mst) {
+			return mst.api_name;
+		}
+		if(Number.isInteger(get_mst_id_to_rate(mst_id))) {
+			return '戦果';
+		}
+		return '不明なアイテム(' + mst_id + ')';
 	} else if(kind == 14) { // 家具
 		var mst = $mst_furniture[mst_id];
 		return mst ? mst.api_title : '不明な家具(' + mst_id + ')'; // 家具は api_title
@@ -2757,6 +2781,9 @@ function get_reward_item_name_count_of_mine(mst_id, kind) {
 		if(Number.isInteger(get_mst_id_to_material_idx(mst_id))) {
 			return name + 'x' + $material.now[get_mst_id_to_material_idx(mst_id)]
 		}
+		if(Number.isInteger(get_mst_id_to_rate(mst_id))) {
+			return '戦果(詳細不詳)';
+		}
 		var useitem = $useitem_list[mst_id];
 		return useitem ?
 			name + 'x' + useitem.api_count :
@@ -2776,7 +2803,11 @@ function translate_reward_info_to_item_names(info) {
 	var names = {};
 	names.kind = get_kind_name(info.api_kind);
 	names.item_name = get_reward_item_name(info.api_mst_id, info.api_kind, info.api_slotitem_level);
-	names.item_count = info.api_mst_id > 900 ? info.api_mst_id - 900 : info.api_count; // 装備運用枠は扱いが特殊: api_count は常に1 mst_id=901 は +1 902 は +2 ... と900番台の下位の数値分だけ保有枠が増加する
+	names.item_count = info.api_mst_id > 900 ?
+		info.api_mst_id - 900 :  // 装備運用枠は扱いが特殊: api_count は常に1 mst_id=901 は +1 902 は +2 ... と900番台の下位の数値分だけ保有枠が増加する
+		(Number.isInteger(get_mst_id_to_rate(info.api_mst_id)) ?
+		get_mst_id_to_rate(info.api_mst_id) :
+		info.api_count);
 	names.item_name_count_of_mine = get_reward_item_name_count_of_mine(info.api_mst_id, info.api_kind);
 	return names;
 }
