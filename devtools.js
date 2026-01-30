@@ -2725,8 +2725,8 @@ function get_mst_id_to_material_idx(mst_id) {
 // 900に近付いていることを考慮すると近日中に装備保有枠の採番がリセットされる可能性もありそう
 function get_mst_id_to_rate(mst_id) {
 	switch(mst_id) {
-	case: 893: return 12; // 329:(日)【節分任務:枡】節分演習！二〇二六
-	case: 894: return 60; // 843:(週)【節分任務:柊】節分拡張作戦二〇二六、重巡出撃！
+	case 893: return 12; // 329:(日)【節分任務:枡】節分演習！二〇二六
+	case 894: return 60; // 843:(週)【節分任務:柊】節分拡張作戦二〇二六、重巡出撃！
 	default: return '不明な戦果(' + mst_id + ')';
 	}
 }
