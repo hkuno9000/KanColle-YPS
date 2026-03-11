@@ -4859,8 +4859,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				if (is_winA && is_current_sortie_map(1, 5)) inc_quest_progress(261, w); // ウィークリー1-5
 			}
 			if(Object.keys($e_lost_ship_type_count).length) {
-				if($e_lost_ship_type_count[7] || $e_lost_ship_type_count[11]) { // 軽空母, 正規空母
-					var num = to_number($e_lost_ship_type_count[7]) + to_number($e_lost_ship_type_count[11]);
+				if($e_lost_ship_type_count[7] || $e_lost_ship_type_count[11] || $e_lost_ship_type_count[18]) { // 軽空母, 正規空母, 装甲空母
+					var num = to_number($e_lost_ship_type_count[7]) + to_number($e_lost_ship_type_count[11]) + to_number($e_lost_ship_type_count[18]);
 					inc_quest_progressN(211, w, num); // 変則デイリー空母3
 					inc_quest_progressN(220, w, num); // い号 ウィークリー空母20
 				}
