@@ -3263,7 +3263,7 @@ function on_battle_result(json) {
 	}
 	if(Object.keys(e_lost_ship_type_count).length) {
 		var e_lost_ship_detail = '敵撃破:';
-		for(stype in e_lost_ship_type_count) { // 連想配列のキーとして取り出すと文字列が得られる
+		for(var stype in e_lost_ship_type_count) { // 連想配列のキーとして取り出すと文字列が得られる
 			e_lost_ship_detail += ' ' + get_ship_type_name(parseInt(stype, 10)) + 'x' + e_lost_ship_type_count[stype];
 		}
 		req.push(e_lost_ship_detail);
