@@ -2769,7 +2769,7 @@ function get_reward_item_name_count_of_mine(mst_id, kind) {
 	if(kind == 11) {
 		var shiplist = $all_ship_id_list[mst_id];
 		return shiplist ?
-			shiplist_names(shiplist) :
+			shiplist_names(shiplist.map(function(id) { return $ship_list[id]; })) :
 			get_reward_item_name(mst_id, kind) + '(未保有)';
 	} else if(kind == 12) {
 		return slotitem_levellist(mst_id).join(',');
