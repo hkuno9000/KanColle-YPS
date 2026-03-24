@@ -9,6 +9,7 @@ var $mst_mapinfo	= load_storage('mst_mapinfo');
 var $mst_mapinfo_no = load_storage('mst_mapinfo_no');
 var $mst_maparea	= load_storage('mst_maparea');
 var $mst_furniture	= load_storage('mst_furniture');
+var $mst_stype		= load_storage('mst_stype');
 var $ship_list		= load_storage('ship_list');
 var $slotitem_list	= load_storage('slotitem_list');
 var $remodel_slotlist = load_storage('remodel_slotlist');
@@ -358,30 +359,31 @@ Ship.prototype.is_ship_type_in_array = function (stypes) {
 // ship_type(stype)から艦種への変換: 対応表も兼ねて
 // @see https://github.com/Nishisonic/logbook/blob/2929c70b87d981775e0ca9d36b45ecf3fca88530/script/questinfo.js
 function get_ship_type_name(stype) {
+	// mst_stype から置き換えるものだけ switch-case で処理
 	switch(stype) {
-	case 1: return '海防艦';
-	case 2: return '駆逐艦';
-	case 3: return '軽巡洋艦';
-	case 4: return '重雷装巡洋艦';
-	case 5: return '重巡洋艦';
-	case 6: return '航空巡洋艦';
-	case 7: return '軽空母';
+	// case 1: return '海防艦';
+	// case 2: return '駆逐艦';
+	// case 3: return '軽巡洋艦';
+	// case 4: return '重雷装巡洋艦';
+	// case 5: return '重巡洋艦';
+	// case 6: return '航空巡洋艦';
+	// case 7: return '軽空母';
 	case 8: return '巡洋戦艦(高速戦艦)';
-	case 9: return '戦艦';
-	case 10: return '航空戦艦';
-	case 11: return '正規空母';
+	// case 9: return '戦艦';
+	// case 10: return '航空戦艦';
+	// case 11: return '正規空母';
 	//case 12: return '超弩級戦艦';
-	case 13: return '潜水艦';
-	case 14: return '潜水空母';
+	// case 13: return '潜水艦';
+	// case 14: return '潜水空母';
 	case 15: return '輸送艦'; // 敵補給艦 区別のため
-	case 16: return '水上機母艦';
-	case 17: return '揚陸艦';
-	case 18: return '装甲空母';
-	case 19: return '工作艦';
-	case 20: return '潜水母艦';
-	case 21: return '練習巡洋艦';
-	case 22: return '補給艦';
-	default: return '艦種不明(' + stype + ')';
+	// case 16: return '水上機母艦';
+	// case 17: return '揚陸艦';
+	// case 18: return '装甲空母';
+	// case 19: return '工作艦';
+	// case 20: return '潜水母艦';
+	// case 21: return '練習巡洋艦';
+	// case 22: return '補給艦';
+	default: return $mst_stype[stype] ? $mst_stype[stype] : '艦種不明(' + stype + ')';
 	}
 }
 
@@ -663,6 +665,15 @@ function update_mst_furniture(list) {
 		$mst_furniture[data.api_id] = data;
 	});
 	save_storage('mst_furniture', $mst_furniture);
+}
+
+function update_mst_stype(list) {
+	if(!list) return;
+	$mst_stype = {};
+	list.forEach(function(data) {
+		$mst_stype[data.api_id] = data.api_name;
+	});
+	save_storage('mst_stype', $mst_stype);
 }
 
 function clear_quest_progress(id)
@@ -3363,7 +3374,7 @@ function on_battle_result(json) {
 	}
 	if(Object.keys(e_lost_ship_type_count).length) {
 		var e_lost_ship_detail = '敵撃破:';
-		for(stype in e_lost_ship_type_count) { // 連想配列のキーとして取り出すと文字列が得られる
+		for(var stype in e_lost_ship_type_count) { // 連想配列のキーとして取り出すと文字列が得られる
 			e_lost_ship_detail += ' ' + get_ship_type_name(parseInt(stype, 10)) + 'x' + e_lost_ship_type_count[stype];
 		}
 		req.push(e_lost_ship_detail);
@@ -4132,6 +4143,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			update_mst_mapinfo(json.api_data.api_mst_mapinfo);
 			update_mst_maparea(json.api_data.api_mst_maparea);
 			update_mst_furniture(json.api_data.api_mst_furniture);
+			update_mst_stype(json.api_data.api_mst_stype);
 			sync_cloud();
 			chrome.runtime.sendMessage("## ロード完了");
 			debug_print_mst_slotitem();
@@ -4962,8 +4974,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				if (is_winA && is_current_sortie_map(1, 5)) inc_quest_progress(261, w); // ウィークリー1-5
 			}
 			if(Object.keys($e_lost_ship_type_count).length) {
-				if($e_lost_ship_type_count[7] || $e_lost_ship_type_count[11]) { // 軽空母, 正規空母
-					var num = to_number($e_lost_ship_type_count[7]) + to_number($e_lost_ship_type_count[11]);
+				if($e_lost_ship_type_count[7] || $e_lost_ship_type_count[11] || $e_lost_ship_type_count[18]) { // 軽空母, 正規空母, 装甲空母
+					var num = to_number($e_lost_ship_type_count[7]) + to_number($e_lost_ship_type_count[11]) + to_number($e_lost_ship_type_count[18]);
 					inc_quest_progressN(211, w, num); // 変則デイリー空母3
 					inc_quest_progressN(220, w, num); // い号 ウィークリー空母20
 				}
