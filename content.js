@@ -171,6 +171,7 @@ function parse_markdown(a) {
 		s = s.replace(/遂行中/g,   '<span style="text-shadow:0 0 1em yellow">$&</span>');
 		s = s.replace(/遂行.0%/g,  '<span style="text-shadow:0 0 1em orange">$&</span>');
 		s = s.replace(/達成!!/g,   '<span style="text-shadow:0 0 1em cyan">$&</span>');
+		s = s.replace(/^\t(クリア済|未出現)\t(.+)\t(.+)\t(.*)/, '\t<span style="color:slategray">$1</span>\t<span style="color:slategray">$2</span>\t<span style="color:slategray">$3</span>\t<span style="color:slategray">$4</span>');
 		s = s.replace(/^\t(クリア済)\t(.+)/, '\t<span style="color:slategray">$1</span>\t<span style="color:slategray">$2</span>');
 		s = s.replace(/@!!(輸送.級)!!@/g, '<span style="color:limegreen">$1</span>');
 		s = s.replace(/@!!(空母.[級姫鬼])!!@/g, '<span style="color:darkorange">$1</span>');

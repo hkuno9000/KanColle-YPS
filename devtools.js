@@ -71,6 +71,7 @@ var $battle_api_data = null;
 var $battle_deck_id = -1;
 var $battle_log = [];
 var $last_mission = {};
+var $current_mission = {};
 var $f_maxhps = null;
 var $f_beginhps = null;
 var $e_beginhps = null;
@@ -829,6 +830,10 @@ function to_date(a) {	///< aが日付型ではなければ日付型に変換し�
 	return new Date(a);
 }
 
+function to_formatted_locale_string(a) {
+	return to_date(a).toLocaleString('ja-JP', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'});
+}
+
 function diff_name(now, prev) {		// now:1, prev:2 -> "(-1)"
 	var diff = now - prev;	// 演算項目のどちらかがundefinedなら減算結果はNaNとなる. 項目がnullならば0として減算する.
 	if (prev == null) return '';	// nullかundefinedなら増減なしと見做して空文字列を返す.
@@ -1267,9 +1272,20 @@ function msec_name(msec) {
 	var sec = msec / 1000;
 	var min = sec / 60;
 	var hh = min / 60;
+	var dd = hh / 24;
+	if (dd  >= 3) return dd.toFixed(1) + '日';
 	if (hh  >= 2) return hh.toFixed(1) + '時間';
 	if (min >= 2) return min.toFixed() + '分';
 	return sec.toFixed() + '秒';
+}
+
+function minute_name(minute) {
+	var min = minute % 60;
+	var hh = Math.floor(minute / 60);
+	if(hh > 0) {
+		return hh + '時間' + (min ? min + '分' : '') ;
+	}
+	return min + '分';
 }
 
 function damage_name(nowhp, maxhp, damage) {
@@ -2657,6 +2673,7 @@ function push_all_fleets(req) {
 			var id = deck.api_mission[1];
 			req.push('遠征' + $mst_mission[id].api_disp_no + ' ' + $mst_mission[id].api_name + ': ' + d.toLocaleString() + '(' + rest + ')');
 			$last_mission[f_id] = '前回遠征: 遠征' + $mst_mission[id].api_disp_no + ' ' + $mst_mission[id].api_name; // 支援遠征では /api_req_mission/result が来ないので、ここで事前更新しておく.
+			$current_mission[f_id] = id;
 		}
 		else if (deck.api_id == $battle_deck_id) {
 			req.push('出撃中: ' + map_name());
@@ -2857,7 +2874,7 @@ function build_selection_support_table_md(reward_list, title, subtitle, dom_id) 
 //------------------------------------------------------------------------
 // イベントハンドラ.
 //
-function on_mission_check(category) {
+function on_mission_check(category, push_additional_info) {
 	let quests = 0;
 	let pending_category = 0;
 	let done_category = 0;
@@ -2927,13 +2944,96 @@ function on_mission_check(category) {
 	if (quests != $quest_count) req.unshift("### @!!任務リスト(全All)を開き、内容を更新してください!!@");
 	if (pending_category > 0) req.unshift('# @!!【警告】 未チェックの任務があります.!!@');
 	if (done_category > 0)    req.unshift('# @!!【警告】 達成済みの任務があります. クリアして追加の任務をチェックしましょう!!@');
+	if (push_additional_info) {
+		push_additional_info(req);
+	}
 	if (req.length > 1) {
-		if (category == 5) {
-			push_ndock_list(req);
-		}
 		push_all_fleets(req);
 		chrome.runtime.sendMessage(req);
 	}
+}
+
+function push_mission_detail(req, json) {
+	var d = json.api_data;
+	var items = d.api_list_items; // api_list_items の遠征一覧は、現在遠征可能なものに限られる
+	req.push('## 遠征');
+	var mission_items = {};
+	for(var i = 0; i < items.length; ++i) {
+		var item = items[i];
+		mission_items[item.api_mission_id] = item;
+	}
+	var map_mission = {};
+	var monthly_mission = {};
+	for(var id in $mst_mission) {
+		var mst = $mst_mission[id];
+		// 出現(未クリア・クリア済)、未出現の区別を引き渡す
+		mst.api_state = mission_items[mst.api_id] ? mission_items[mst.api_id].api_state : null;
+		array_push(map_mission, mst.api_maparea_id, mst);
+		// マンスリーを抜粋
+		if(mst.api_reset_type > 0) {
+			array_push(monthly_mission, mst.api_maparea_id, mst);
+		}
+	}
+	// マンスリー遠征
+	const limit_time = d.api_limit_time[0] * 1000;
+	req.push('### マンスリー抜粋 遠征期限: ' + to_formatted_locale_string(limit_time) + '(残' + msec_name(limit_time - $pcDateTime.getTime()) + ')');
+	var monthly = ['YPS_mission_monthly'];
+	for(var area_id in monthly_mission) {
+		var missions = monthly_mission[area_id];
+		for(var i = 0; i < missions.length; ++i) {
+			var mission = missions[i];
+			if(i == 0) {
+				monthly.push('\t==' + get_maparea_name(area_id) + '\t~~');
+			}
+			var str = '';
+			if(Object.values($current_mission).includes(mission.api_id)) {
+				str += '\t遂行中';
+			} else if(mission.api_state > 0) {
+				str += mission.api_state == 1 ? '\t未クリア' : '\tクリア済';
+			} else {
+				str += '\t未出現';
+			}
+			str += '\t' + mission.api_disp_no + ':' + mission.api_name + '\t' + minute_name(mission.api_time) + '\t';
+			if(mission.api_damage_type > 0) {
+				str += '交戦' + mission.api_damage_type + '型';
+			}
+			monthly.push(str);
+		}
+	}
+	req.push(monthly);
+
+	// 各海域の遠征
+	for(var area_id in map_mission) {
+		req.push('### ' + get_maparea_name(area_id));
+		var mission_req = ['YPS_mission_area' + area_id];
+		var missions = map_mission[area_id];
+		for(var i = 0; i < missions.length; ++i) {
+			var mission = missions[i];
+			var str = '';
+			if(mission.api_state > 0) {
+				if(Object.values($current_mission).includes(mission.api_id)) {
+					str += '\t遂行中';
+				} else if(/(?:前衛|艦隊決戦)支援任務/.test(mission.api_name)) {
+					str += '\t支援';
+				} else if(mission.api_state == 1) {
+					str += '\t未クリア';
+				} else if(mission.api_reset_type > 0) {
+					str += '\tクリア済';
+				} else {
+					str += '\t'; // 通常遠征はグレーアウトさせたくないのでクリア済表記はしない
+				}
+			} else {
+				str += '\t未出現';
+			}
+			str += '\t' + mission.api_disp_no + ':' + mission.api_name + '\t' + minute_name(mission.api_time) + '\t';
+			if(mission.api_damage_type > 0) {
+				str += '交戦' + mission.api_damage_type + '型';
+			}
+			mission_req.push(str);
+		}
+		req.push(mission_req);
+	}
+	
 }
 
 function on_next_cell(json) {
@@ -4431,7 +4531,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				print_port();
 			}
 			else {
-				on_mission_check(5);
+				on_mission_check(5, push_ndock_list);
 			}
 		};
 	}
@@ -4489,6 +4589,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			$command_lv   = basic.api_level;
 			$max_ship     = basic.api_max_chara;
 			$max_slotitem = basic.api_max_slotitem + 3;
+			$current_mission = {};
 			if ($battle_deck_id > 0) {
 				var log = map_name();
 				var msg = ['YPS_mission'+$battle_deck_id];
@@ -4554,7 +4655,9 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_get_member/mission') {
 		// 遠征メニュー.
 		func = function(json) { // 遠征任務の受諾をチェックする.
-			on_mission_check(4);
+			on_mission_check(4, function(req) {
+				push_mission_detail(req, json);
+			});
 		};
 	}
 	else if (api_name == '/api_req_mission/start') {
