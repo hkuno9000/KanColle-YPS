@@ -2829,15 +2829,30 @@ function get_reward_item_name_count_of_mine(mst_id, kind) {
 function translate_reward_info_to_item_names(info) {
 	// info: { api_no, api_kind, api_mst_id, api_slotitem_level, api_count }
 	var names = {};
+	var mst_id = adjust_reward_info_mst_id_if_blank_mst_useitem(info.api_mst_id, info.api_kind);
 	names.kind = get_kind_name(info.api_kind);
-	names.item_name = get_reward_item_name(info.api_mst_id, info.api_kind, info.api_slotitem_level);
-	names.item_count = info.api_mst_id > 900 ?
-		info.api_mst_id - 900 :  // 装備運用枠は扱いが特殊: api_count は常に1 mst_id=901 は +1 902 は +2 ... と900番台の下位の数値分だけ保有枠が増加する
-		(Number.isInteger(get_mst_id_to_rate(info.api_mst_id)) ?
-		get_mst_id_to_rate(info.api_mst_id) :
+	names.item_name = get_reward_item_name(mst_id, info.api_kind, info.api_slotitem_level);
+	names.item_count = mst_id > 900 ?
+		mst_id - 900 :  // 装備運用枠は扱いが特殊: api_count は常に1 mst_id=901 は +1 902 は +2 ... と900番台の下位の数値分だけ保有枠が増加する
+		(Number.isInteger(get_mst_id_to_rate(mst_id)) ?
+		get_mst_id_to_rate(mst_id) :
 		info.api_count);
-	names.item_name_count_of_mine = get_reward_item_name_count_of_mine(info.api_mst_id, info.api_kind);
+	names.item_name_count_of_mine = get_reward_item_name_count_of_mine(mst_id, info.api_kind);
 	return names;
+}
+
+function adjust_reward_info_mst_id_if_blank_mst_useitem(mst_id, kind) {
+	if(kind != 13) {
+		return mst_id;
+	}
+	if(get_reward_item_name(mst_id, kind) != '') {
+		return mst_id;
+	}
+	switch(mst_id) {
+	// api_material の並びからの混同による例外的 mst_id と思われるが汎用的な対処が可能か判断がつかないので一旦ベタ書きで対処
+	case 5: return 2; // 高速建造材 
+	}
+	return mst_id;
 }
 
 function build_selection_support_table_md(reward_list, title, subtitle, dom_id) {
