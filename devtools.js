@@ -685,16 +685,7 @@ function clear_quest_progress(id)
 }
 
 function inc_quest_progress(id, w) {
-	const quest = $quest_list[id];
-	const complete = $quest_complete_daily[id] || $quest_complete_weekly[id];
-	if (complete && quest && quest.api_state == 2) {
-		w = w || get_weekly();
-		if (w.quest_progress[id] == null) w.quest_progress[id] = 0; // dirty hack.
-		if (++w.quest_progress[id] >= complete) {
-			quest.api_state = 3;
-		}
-		w.savetime = 0; // calling save_weekly()
-	}
+	inc_quest_progressN(id, w, 1);
 }
 
 function inc_quest_progressN(id, w, n) {
