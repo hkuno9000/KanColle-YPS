@@ -685,16 +685,7 @@ function clear_quest_progress(id)
 }
 
 function inc_quest_progress(id, w) {
-	const quest = $quest_list[id];
-	const complete = $quest_complete_daily[id] || $quest_complete_weekly[id];
-	if (complete && quest && quest.api_state == 2) {
-		w = w || get_weekly();
-		if (w.quest_progress[id] == null) w.quest_progress[id] = 0; // dirty hack.
-		if (++w.quest_progress[id] >= complete) {
-			quest.api_state = 3;
-		}
-		w.savetime = 0; // calling save_weekly()
-	}
+	inc_quest_progressN(id, w, 1);
 }
 
 function inc_quest_progressN(id, w, n) {
@@ -2753,6 +2744,7 @@ function get_mst_id_to_material_idx(mst_id) {
 // 900に近付いていることを考慮すると近日中に装備保有枠の採番がリセットされる可能性もありそう
 function get_mst_id_to_rate(mst_id) {
 	switch(mst_id) {
+	case 892: return 500; // 955:(月)【梅雨任務拡張作戦】南方反攻望楼作戦を叩け！
 	case 893: return 12; // 329:(日)【節分任務:枡】節分演習！二〇二六
 	case 894: return 60; // 843:(週)【節分任務:柊】節分拡張作戦二〇二六、重巡出撃！
 	default: return '不明な戦果(' + mst_id + ')';
@@ -2784,6 +2776,10 @@ function get_reward_item_name(mst_id, kind, level) {
 		}
 		if(Number.isInteger(get_mst_id_to_rate(mst_id))) {
 			return '戦果';
+		}
+		// 暫定
+		if(mst_id > 800) {
+			return '不明な推定戦果(' + mst_id + ')';
 		}
 		return '不明なアイテム(' + mst_id + ')';
 	} else if(kind == 14) { // 家具
@@ -2836,6 +2832,8 @@ function translate_reward_info_to_item_names(info) {
 		mst_id - 900 :  // 装備運用枠は扱いが特殊: api_count は常に1 mst_id=901 は +1 902 は +2 ... と900番台の下位の数値分だけ保有枠が増加する
 		(Number.isInteger(get_mst_id_to_rate(mst_id)) ?
 		get_mst_id_to_rate(mst_id) :
+		mst_id > 800 ?
+		1 : // 暫定: 不明な推定戦果用
 		info.api_count);
 	names.item_name_count_of_mine = get_reward_item_name_count_of_mine(mst_id, info.api_kind);
 	return names;
@@ -4772,8 +4770,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					var ty = (evm && evm.api_gauge_type) ? evm.api_gauge_type : data.api_gauge_type;
 					var now = evm ? evm.api_now_maphp : data.api_defeat_count;
 					var max = evm ? evm.api_max_maphp : data.api_required_defeat_count;
-					// 通常海域では 7-2 7-3 7-5 が複数ゲージだがデータ上区別できないので決め打ち
-					var gn = ((evm && evm.api_state == 1) || data.api_id == 72 || data.api_id == 73 || data.api_id == 75) ? data.api_gauge_num : 0;
+					// 通常海域では 5-6 7-2 7-3 7-5 が複数ゲージだがデータ上区別できないので決め打ち
+					var gn = ((evm && evm.api_state == 1) || data.api_id == 56 || data.api_id == 72 || data.api_id == 73 || data.api_id == 75) ? data.api_gauge_num : 0;
 					// 通常海域のTPの増減の向きを補正(例 5-6-1)
 					if(!evm && ty == 3) {
 						now = max - now;
