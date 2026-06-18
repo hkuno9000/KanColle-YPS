@@ -2753,6 +2753,7 @@ function get_mst_id_to_material_idx(mst_id) {
 // 900に近付いていることを考慮すると近日中に装備保有枠の採番がリセットされる可能性もありそう
 function get_mst_id_to_rate(mst_id) {
 	switch(mst_id) {
+	case 892: return 500; // 955:(月)【梅雨任務拡張作戦】南方反攻望楼作戦を叩け！
 	case 893: return 12; // 329:(日)【節分任務:枡】節分演習！二〇二六
 	case 894: return 60; // 843:(週)【節分任務:柊】節分拡張作戦二〇二六、重巡出撃！
 	default: return '不明な戦果(' + mst_id + ')';
@@ -2784,6 +2785,10 @@ function get_reward_item_name(mst_id, kind, level) {
 		}
 		if(Number.isInteger(get_mst_id_to_rate(mst_id))) {
 			return '戦果';
+		}
+		// 暫定
+		if(mst_id > 800) {
+			return '不明な推定戦果(' + mst_id + ')';
 		}
 		return '不明なアイテム(' + mst_id + ')';
 	} else if(kind == 14) { // 家具
@@ -2836,6 +2841,8 @@ function translate_reward_info_to_item_names(info) {
 		mst_id - 900 :  // 装備運用枠は扱いが特殊: api_count は常に1 mst_id=901 は +1 902 は +2 ... と900番台の下位の数値分だけ保有枠が増加する
 		(Number.isInteger(get_mst_id_to_rate(mst_id)) ?
 		get_mst_id_to_rate(mst_id) :
+		mst_id > 800 ?
+		1 : // 暫定: 不明な推定戦果用
 		info.api_count);
 	names.item_name_count_of_mine = get_reward_item_name_count_of_mine(mst_id, info.api_kind);
 	return names;
