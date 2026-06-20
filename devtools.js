@@ -38,6 +38,7 @@ var $mapinfo_rank = {};	// 海域難易度 undefined:なし, 1:丁, 2:丙, 3:乙
 var $locked_ship_idset = {};	// ロック艦の艦種IDセット.
 var $locked_ship_double = {};	// ロック艦のダブリ順番号マップ. [艦固有ID] := 1:一隻目, 2:二隻目, 3:三隻目...
 var $all_ship_id_list = {};	// 艦種IDで引けるダブり艦固有ID(背番号)リスト. [艦種ID] := [艦固有ID1, 艦固有ID2 ...]
+var $unlocked_remodel_ship_idset = {};	// 改造済み艦(未ロック)の艦種IDセット
 var $next_mapinfo = null;
 var $next_enemy = null;
 var $is_boss = false;
@@ -1967,8 +1968,11 @@ function print_port() {
 			if (ship.lv >= 10) { // Lv10以上なら、名前を強調表示し、警告カウントを上げる.
 				unlock_lv10++;
 				name = '@!!' + name + '!!@';
+				if(id != begin_id) { // 最低改造Lvは10
+					$unlocked_remodel_ship_idset[begin_id] = true; // 非ロックだが手元に残してある改造済み艦
+				}
 			}
-			else if (ship.lv == 1 && !$locked_ship_idset[begin_id]) { // 新規艦を強調表示する.
+			else if (ship.lv == 1 && !$locked_ship_idset[begin_id] && !$unlocked_remodel_ship_idset[begin_id]) { // 新規艦を強調表示する.
 				newship++;
 				name = '@!!New★' + name + '!!@';
 			}
