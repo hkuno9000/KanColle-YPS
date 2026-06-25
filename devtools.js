@@ -4116,7 +4116,7 @@ function on_mp3(url) {
 		if($wait_gimmick_interruption) {
 			chrome.runtime.sendMessage({
 				interruptData: {
-					key: 'YPS_material',
+					key: '#YPS_material',
 					value: ['### @!!ギミック達成音が鳴りました!!@']
 				}
 			});
