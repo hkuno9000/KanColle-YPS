@@ -1370,10 +1370,16 @@ function battle_cl_name(a) {
 	}
 }
 
-function map_name(mst) { // "演習 5", "1-1: 鎮守府正面海域", "40-2甲: 台湾沖/ルソン島沖 TP363/400(90%)" etc..
+function map_name(mst, shorthand) { // "演習 5", "1-1: 鎮守府正面海域", "40-2甲: 台湾沖/ルソン島沖 TP363/400(90%)" etc..
 	if (!mst) mst = $next_mapinfo;
 	let s = mst.api_name;
-	if (mst.api_no) s = mst.api_maparea_id + '-' + mst.api_no + map_rank_name($mapinfo_rank[mst.api_id]) + ': ' + s;
+	if (mst.api_no) {
+		let short = mst.api_maparea_id + '-' + mst.api_no + map_rank_name($mapinfo_rank[mst.api_id]);
+		if(shorthand) {
+			return short;
+		}
+		s = short + ': ' + s;
+	}
 	if (mst.yps_opt_name) s +=  ' ' + mst.yps_opt_name;
 	return s;
 }
