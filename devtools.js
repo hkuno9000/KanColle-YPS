@@ -1618,6 +1618,7 @@ Daihatu.prototype.count_up = function(value) {
 		this.sum++;
 		break;
 	case 409:	// 武装大発.
+	case 576:	// 大発動艇(R35&フランス兵).
 		this.up += 3;
 		this.level += value.level;
 		this.sum++;
