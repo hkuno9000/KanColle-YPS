@@ -3466,7 +3466,7 @@ function on_battle_result(json) {
 		var reward = transform_battleresult_select_reward_to_questlist_format(d.api_select_reward_dict);
 		var table_md = build_selection_support_table_md(
 			reward,
-			map_name() + '突破報酬'. // title
+			map_name() + '突破報酬', // title
 			map_name(null, true), // subtitle // map_name() そのままだとやや冗長
 			'YPS_clear_reward' // dom_id
 		);
