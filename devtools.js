@@ -1370,10 +1370,16 @@ function battle_cl_name(a) {
 	}
 }
 
-function map_name(mst) { // "演習 5", "1-1: 鎮守府正面海域", "40-2甲: 台湾沖/ルソン島沖 TP363/400(90%)" etc..
+function map_name(mst, shorthand) { // "演習 5", "1-1: 鎮守府正面海域", "40-2甲: 台湾沖/ルソン島沖 TP363/400(90%)" etc..
 	if (!mst) mst = $next_mapinfo;
 	let s = mst.api_name;
-	if (mst.api_no) s = mst.api_maparea_id + '-' + mst.api_no + map_rank_name($mapinfo_rank[mst.api_id]) + ': ' + s;
+	if (mst.api_no) {
+		let short = mst.api_maparea_id + '-' + mst.api_no + map_rank_name($mapinfo_rank[mst.api_id]);
+		if(shorthand) {
+			return short;
+		}
+		s = short + ': ' + s;
+	}
 	if (mst.yps_opt_name) s +=  ' ' + mst.yps_opt_name;
 	return s;
 }
@@ -2900,6 +2906,48 @@ function build_selection_support_table_md(reward_list, title, subtitle, dom_id) 
 	return ['### ' + title, md];
 }
 
+/**
+ * 選択式のイベント海域突破報酬 api_select_reward_dict の api_type を
+ * 選択式の任務クリア報酬 api_select_rewards の api_kind に変換する
+ */
+function get_dict_type_to_kind(type) {
+	switch(type) {
+	case 1: return 13; // アイテム
+	case 2: return 11; // 艦船
+	case 3: return 12; // 装備
+	case 4: return 1;  // 資源
+	case 5: return 14; // 家具
+	default: return 'unknown dict(' + type + ')';
+	}
+}
+
+/**
+ * api_select_reward_dict を api_select_rewards のフォーマットに変換する
+ */
+function transform_battleresult_select_reward_to_questlist_format(reward_list) {
+	// reward_list {idx: [{api_item_no, api_type, api_id, api_slot_level, api_value}, ... ] }
+	var result_list = {};
+	for(var idx in reward_list) {
+		var rw_set = reward_list[idx];
+		var result_set = [];
+		for(var i = 0; i < rw_set.length; ++i) {
+			var rw = rw_set[i];
+			var result = {};
+			result.api_no = rw.api_item_no;
+			result.api_kind = get_dict_type_to_kind(rw.api_type);
+			result.api_mst_id = rw.api_id;
+			result.api_count = rw.api_value;
+			if(rw.api_slot_level) {
+				result.api_slotitem_level = rw.api_slot_level;
+			}
+			
+			result_set.push(result);
+		}
+		result_list[idx] = result_set;
+	}
+	return result_list;
+}
+
 //------------------------------------------------------------------------
 // イベントハンドラ.
 //
@@ -3414,6 +3462,22 @@ function on_battle_result(json) {
 	console.error(ex);
   } finally {
 	chrome.runtime.sendMessage({ appendData: req });
+
+	if(d.api_select_reward_dict) {
+		var reward = transform_battleresult_select_reward_to_questlist_format(d.api_select_reward_dict);
+		var table_md = build_selection_support_table_md(
+			reward,
+			map_name() + '突破報酬', // title
+			map_name(null, true), // subtitle // map_name() そのままだとやや冗長
+			'YPS_clear_reward' // dom_id
+		);
+		chrome.runtime.sendMessage({
+			interruptData: {
+				key: 'h2.markdownH2',
+				value:  ['## 突破した海域に選択報酬があります'].concat(table_md)
+			}
+		});
+	}
   }
 }
 
@@ -4117,7 +4181,7 @@ function on_mp3(url) {
 		if($wait_gimmick_interruption) {
 			chrome.runtime.sendMessage({
 				interruptData: {
-					key: 'YPS_material',
+					key: '#YPS_material',
 					value: ['### @!!ギミック達成音が鳴りました!!@']
 				}
 			});

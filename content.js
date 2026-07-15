@@ -330,7 +330,8 @@ chrome.runtime.onMessage.addListener(function (req) {
 		pop_history();
 		var temp = document.createElement('div');
 		temp.classList.add('yps-interrupt');
-		div.insertBefore(temp, document.getElementById(req.interruptData.key));
+		var insertPoint = document.querySelector(req.interruptData.key);
+		div.insertBefore(temp, insertPoint);
 		temp.innerHTML = parse_markdown(req.interruptData.value);
 	}
 	else if (req.ship_export_json) {
