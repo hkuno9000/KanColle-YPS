@@ -18,7 +18,7 @@ var $useitem_list       = load_storage('useitem_list');
 var $furniture_list = load_storage('furniture_list');
 var $enemy_db		= load_storage('enemy_db');
 var $weekly			= load_storage('weekly');
-var $quest_clear	= load_storage('quest_clear');
+var $quest_clear	= load_quest_clear();
 var $logbook		= load_storage('logbook', []);
 var $quest_list		= load_storage('quest_list');
 var $air_base		= load_storage('air_base', []); // for noro6/kc-web
@@ -428,6 +428,14 @@ function save_quest_clear() {
 	$quest_clear.savetime = Date.now();
 	chrome.storage.sync.set({quest_clear: JSON.stringify($quest_clear)});
 	save_storage('quest_clear', $quest_clear);
+}
+
+function load_quest_clear() {
+	var qc = load_storage('quest_clear');
+	for(var k in qc) {
+		qc[k] = to_date(qc[k]).getTime();
+	}
+	return qc;
 }
 
 function load_storage(name, def) {
@@ -4599,7 +4607,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		let quest = $quest_list[id];
 		if (quest) {
 			quest.api_state = -1; // 達成をリセットする.
-			$quest_clear[id] = $svDateTime; // クリア時刻を記録し、クリア済みをマークする.
+			$quest_clear[id] = $svDateTime.getTime(); // クリア時刻を記録し、クリア済みをマークする.
 			$quest_count--;		// 絞り込み任務リストの場合は, 直後の api_get_member/questlist では任務総数が得られないのでここで更新する.
 			save_quest_clear();
 			// 直後に来る /api_get_member/questlist の処理にて、遂行中任務カウンタ更新とデータ保存と再表示が行われるので、ここではそれらの処理は不要である.
