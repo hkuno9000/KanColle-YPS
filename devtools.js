@@ -3177,7 +3177,11 @@ function on_next_cell(json) {
 		var msg = area;
 		msg += ':揚陸地点';
 		$battle_log.push(msg);
-		print_next('next event' + boss_next_name(), msg);
+		if(seiku_notify) {
+			print_next('next event' + boss_next_name(), [msg, seiku_notify]);
+		} else {
+			print_next('next event' + boss_next_name(), msg);
+		}
 	}
 	else {	// 戦闘マス.
 		var req = [area];
