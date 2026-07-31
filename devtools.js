@@ -2400,7 +2400,7 @@ function slotitem_levellist(mstid) {
 	var basename = slotitem_name(mstid);
 	for (var id in $slotitem_list) {
 		var value = $slotitem_list[id];
-		if (value.item_id == mstid) {
+		if (value && value.item_id == mstid) {
 			var name = slotitem_name(value.item_id, value.level, value.alv);
 			if (count[name] == null)
 				count[name] = 1;
