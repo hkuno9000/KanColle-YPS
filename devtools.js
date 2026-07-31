@@ -68,6 +68,7 @@ var $ndock_list = {};
 var $do_print_port_on_ndock = false;
 var $do_print_port_on_slot_item = false;
 var $wait_gimmick_interruption = 0;
+var $event_object = null;
 var $kdock_list = {};
 var $battle_api_data = null;
 var $battle_deck_id = -1;
@@ -1930,6 +1931,9 @@ function print_port() {
 	var drumcan_condxx = [];
 	var sally_area = {};
 	const weekly = get_weekly();
+	if($event_object && $event_object.api_m_flag2) {
+		req.push('@!!ギミック達成！!!@');
+	}
 	//
 	// ロック装備を種類毎に集計する.
 	for (var id in $slotitem_list) {
@@ -3128,6 +3132,9 @@ function on_next_cell(json) {
 		seiku_notify = seiku.match(/優勢|確保/ui) && !$next_mapinfo.yps_cleared ?
 			('### 基地空襲の発生:@!!' + seiku + '!!@') :
 			('### 基地空襲の発生:' + seiku);
+		if(d.api_destruction_battle.api_m1) {
+			seiku_notify += ' @!!ギミック達成！' + d.api_destruction_battle.api_m1 + '!!@';
+		}
 	}
 	if (d.api_event_id == 5) {
 		area += '(boss)';
@@ -3330,6 +3337,9 @@ function on_battle_result(json) {
 	}
 
 	$escape_info = d.api_escape;	// on_goback_port()で使用する.
+	if (d.api_m1) {
+		req.push('@!!ギミック達成:' + d.api_m1 + '!!@');
+	}
 	if (e) {
 		if ($next_mapinfo) {
 			var map_rank = $mapinfo_rank[$next_mapinfo.api_id];
@@ -4693,6 +4703,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				$battle_deck_id = -1;
 				$do_print_port_on_slot_item = true;	// 戦闘直後の母港帰還時は、後続する slot_item で艦載機の熟練度が更新されるまで print_port() を遅延する.
 				$wait_gimmick_interruption = 5; // API呼び出し5回分ギミック達成判定を追う
+				$event_object = json.api_data.api_event_object;
 			}
 			else {
 				print_port();
