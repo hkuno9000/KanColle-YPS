@@ -3307,7 +3307,7 @@ function ship_name_lv(idx, ae, ff) {
 			if (f.api_ship_lv) s +=    'Lv' + f.api_ship_lv[i];
 			return s;
 		}
-		if ($combined_flag && idx >= 6) {
+		if ($combined_flag && $battle_deck_id == 1 && idx >= 6) {
 			let s = '(第二艦隊' + (idx-6+1) + ')';
 			if ($debug_battle_json) return s + $debug_ship_names[idx];
 			let fdeck = $fdeck_list[2];
