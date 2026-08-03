@@ -1330,6 +1330,8 @@ function battle_type_name(a, si) {
 	case 106: return '姉妹艦連携砲撃';
 	case 200: return '瑞雲立体攻撃';
 	case 201: return '海空立体攻撃';
+	case 300:
+	case 301:
 	case 302: return '潜水艦隊攻撃';
 	case 400: return '大和突撃(3隻)';
 	case 401: return '大和突撃(2隻)';
@@ -1362,6 +1364,8 @@ function battle_sp_name(a, si) {
 	case 105: return 'Richelieu圧倒';
 	case 106: return '姉妹艦連携砲撃';
 	case 200: return '夜間瑞雲カットイン';
+	case 300:
+	case 301:
 	case 302: return '潜水艦隊攻撃';
 	case 400: return '大和突撃(3隻)';
 	case 401: return '大和突撃(2隻)';
@@ -3563,6 +3567,7 @@ function calc_damage(result, title, battle, fhp, ehp, active_deck, ff) {
 				else if (/^潜水艦隊攻撃/.test(ty)) {
 					// @see https://wikiwiki.jp/kancolle/%E5%A4%A7%E9%AF%A8#SpecialAttack
 					// 潜水艦隊攻撃が発動しているということは2-4番艦の中破以上の被害は多くとも1隻まで
+					// 攻撃種別の 300 301 302 によって攻撃艦の判定が可能らしい
 					if ( j == 1 ) {
 						if(fhp[at+1] / $f_maxhps[at+1] <= 0.5) { // 2番艦中破時は3番艦に
 							at += 2;
