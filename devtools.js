@@ -77,7 +77,8 @@ var NotificationManager = {
 			if (mission_end > 0) {
 				var id = deck.api_mission[1];
 				var m_name = ($mst_mission && $mst_mission[id]) ? $mst_mission[id].api_name : ('遠征' + id);
-				this.setAlarm('mission_' + f_id, mission_end, '遠征帰投', '第' + f_id + '艦隊（' + m_name + '）が遠征から帰投しました。');
+				var alarm_time = (mission_end - 60 * 1000 > nowTime) ? (mission_end - 60 * 1000) : mission_end;
+				this.setAlarm('mission_' + f_id, alarm_time, '遠征帰投', '第' + f_id + '艦隊（' + m_name + '）が遠征から帰投しました。');
 				delete this._fleet_cond_timers[f_id];
 				this.clearAlarm('cond_' + f_id);
 			} else {
@@ -148,6 +149,7 @@ var NotificationManager = {
 	},
 	syncNdocks: function() {
 		var active_docks = {};
+		var nowTime = ($pcDateTime ? $pcDateTime.getTime() : Date.now());
 		if ($ndock_list) {
 			for (var ship_id in $ndock_list) {
 				var d = $ndock_list[ship_id];
@@ -161,7 +163,8 @@ var NotificationManager = {
 			if (d) {
 				var ship = ($ship_list && d.api_ship_id) ? $ship_list[d.api_ship_id] : null;
 				var ship_name_str = (ship && $mst_ship) ? ship_name(ship.ship_id) : '艦娘';
-				this.setAlarm('ndock_' + dock_id, d.api_complete_time, '入渠完了', '第' + dock_id + 'ドック（' + ship_name_str + '）の入渠が完了しました。');
+				var alarm_time = (d.api_complete_time - 60 * 1000 > nowTime) ? (d.api_complete_time - 60 * 1000) : d.api_complete_time;
+				this.setAlarm('ndock_' + dock_id, alarm_time, '入渠完了', '第' + dock_id + 'ドック（' + ship_name_str + '）の入渠が完了しました。');
 			} else {
 				this.clearAlarm('ndock_' + dock_id);
 			}
