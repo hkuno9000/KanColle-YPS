@@ -29,7 +29,11 @@ chrome.runtime.onMessage.addListener(function (req) {
 
 chrome.alarms.onAlarm.addListener(function (alarm) {
 	var key = 'alarm_' + alarm.name;
-	chrome.storage.local.get(key, function (res) {
+	chrome.storage.local.get(['yps_notification_enabled', key], function (res) {
+		if (!res || !res.yps_notification_enabled) {
+			chrome.storage.local.remove(key);
+			return;
+		}
 		var data = res[key] || {};
 		chrome.notifications.create(alarm.name + '_' + Date.now(), {
 			type: 'basic',

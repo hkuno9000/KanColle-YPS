@@ -24,10 +24,35 @@ var $quest_list		= load_storage('quest_list');
 var $air_base		= load_storage('air_base', []); // for noro6/kc-web
 
 var NotificationManager = {
+	enabled: false,
 	_cache: {},
 	_fleet_cond_timers: {},
 	_airbase_timers: {},
+	init: function() {
+		var self = this;
+		if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+			chrome.storage.local.get('yps_notification_enabled', function(res) {
+				self.enabled = !!(res && res.yps_notification_enabled);
+				if (self.enabled) {
+					self.syncAll();
+				}
+			});
+			if (chrome.storage.onChanged) {
+				chrome.storage.onChanged.addListener(function(changes, area) {
+					if (area === 'local' && changes.yps_notification_enabled) {
+						self.enabled = !!changes.yps_notification_enabled.newValue;
+						if (self.enabled) {
+							self.syncAll();
+						} else {
+							self.clearAll();
+						}
+					}
+				});
+			}
+		}
+	},
 	setAlarm: function(name, when, title, message) {
+		if (!this.enabled) return;
 		if (when <= Date.now()) {
 			this.clearAlarm(name);
 			return;
@@ -57,7 +82,21 @@ var NotificationManager = {
 			});
 		}
 	},
+	clearAll: function() {
+		for (var key in this._cache) {
+			chrome.runtime.sendMessage({
+				alarm: {
+					action: 'clear',
+					name: key
+				}
+			});
+		}
+		this._cache = {};
+		this._fleet_cond_timers = {};
+		this._airbase_timers = {};
+	},
 	syncAll: function() {
+		if (!this.enabled) return;
 		this.syncMissionsAndCond();
 		this.syncNdocks();
 		this.syncAirBase();
@@ -228,6 +267,7 @@ var NotificationManager = {
 		});
 	}
 };
+NotificationManager.init();
 var $debug_battle_json = null;
 var $debug_ship_names = [];
 var $debug_api_name = '';
