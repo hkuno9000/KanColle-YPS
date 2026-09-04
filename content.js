@@ -352,7 +352,9 @@ chrome.runtime.onMessage.addListener(function (req) {
 	if (!div.parentNode) document.body.replaceChild(div, hst); // 履歴表示を中断する.
 	if (req instanceof Array) {
 		div.innerHTML = parse_markdown(req);
-		navi.innerHTML = all_close_button() + history_buttons() + notification_button() + version_banner() + "<br/>" + copy_button();
+		navi.innerHTML = all_close_button() + history_buttons() + version_banner() + "<br/>"
+			+ copy_button() + "<br/>"
+			+ notification_button();
 	}
 	else if (req.appendData) {
 		pop_history();
