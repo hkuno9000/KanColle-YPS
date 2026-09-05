@@ -27,7 +27,6 @@ var NotificationManager = {
 	enabled: false,
 	_cache: {},
 	_fleet_cond_timers: {},
-	_airbase_timers: {},
 	init: function() {
 		var self = this;
 		if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
@@ -93,13 +92,11 @@ var NotificationManager = {
 		}
 		this._cache = {};
 		this._fleet_cond_timers = {};
-		this._airbase_timers = {};
 	},
 	syncAll: function() {
 		if (!this.enabled) return;
 		this.syncMissionsAndCond();
 		this.syncNdocks();
-		this.syncAirBase();
 	},
 	syncMissionsAndCond: function() {
 		if (!$fdeck_list) return;
@@ -208,63 +205,6 @@ var NotificationManager = {
 				this.clearAlarm('ndock_' + dock_id);
 			}
 		}
-	},
-	syncAirBase: function() {
-		if (!$air_base || !Array.isArray($air_base)) return;
-		var self = this;
-		var nowTime = ($pcDateTime ? $pcDateTime.getTime() : Date.now());
-		$air_base.forEach(function(data) {
-			if (!data || !data.api_area_id || !data.api_rid) return;
-			var plane_info = data.api_plane_info;
-			var max_ab_cond = 1;
-			if (plane_info && Array.isArray(plane_info)) {
-				for (var j = 0; j < plane_info.length; j++) {
-					if (plane_info[j].api_state > 0 && plane_info[j].api_cond > max_ab_cond) {
-						max_ab_cond = plane_info[j].api_cond;
-					}
-				}
-			}
-			var ab_alarm_id = 'airbase_cond_' + data.api_area_id + '_' + data.api_rid;
-			var ab_name = get_maparea_name(data.api_area_id) + ' 第' + data.api_rid + '基地航空隊';
-			if (max_ab_cond >= 2) {
-				var cached = self._airbase_timers[ab_alarm_id];
-				// 休息(4)なら回復速度2倍（1段階あたり7.5分）、それ以外は1段階あたり15分
-				var stepMinutes = (data.api_action_kind === 4) ? 7.5 : 15;
-				var needSteps = (max_ab_cond === 3 ? 2 : 1);
-				var totalDuration = needSteps * stepMinutes * 60 * 1000;
-
-				if (cached) {
-					if (max_ab_cond > cached.cond) {
-						// 疲労悪化時は新しい目標時刻で再計算
-						var targetTime = nowTime + totalDuration;
-						self._airbase_timers[ab_alarm_id] = { cond: max_ab_cond, when: targetTime, notified: false, action_kind: data.api_action_kind };
-						self.setAlarm(ab_alarm_id, targetTime, '基地航空隊 疲労回復', ab_name + 'の疲労が回復しました。');
-					} else if (cached.action_kind !== data.api_action_kind) {
-						// 行動種別変更時（休息への切り替え等）は再計算
-						var targetTime = nowTime + (needSteps * stepMinutes * 60 * 1000);
-						self._airbase_timers[ab_alarm_id] = { cond: max_ab_cond, when: targetTime, notified: false, action_kind: data.api_action_kind };
-						self.setAlarm(ab_alarm_id, targetTime, '基地航空隊 疲労回復', ab_name + 'の疲労が回復しました。');
-					} else if (cached.when > nowTime) {
-						// 回復進行中または同一condでタイマー未満了：当初の目標時刻を維持（Timer Drift防止）
-						cached.cond = max_ab_cond;
-						self.setAlarm(ab_alarm_id, cached.when, '基地航空隊 疲労回復', ab_name + 'の疲労が回復しました。');
-					} else {
-						// 満了後かつ疲労悪化なし：ゴースト再セットを防止
-						cached.cond = max_ab_cond;
-						cached.notified = true;
-						self.clearAlarm(ab_alarm_id);
-					}
-				} else {
-					// 新規タイマーセット
-					var targetTime = nowTime + totalDuration;
-					self._airbase_timers[ab_alarm_id] = { cond: max_ab_cond, when: targetTime, notified: false, action_kind: data.api_action_kind };
-					self.setAlarm(ab_alarm_id, targetTime, '基地航空隊 疲労回復', ab_name + 'の疲労が回復しました。');
-				}
-			} else {
-				delete self._airbase_timers[ab_alarm_id];
-				self.clearAlarm(ab_alarm_id);
-			}
-		});
 	}
 };
 NotificationManager.init();
@@ -5186,68 +5126,6 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			}
 			NotificationManager.syncAll();
 			print_mapinfo(uncleared, air_base);
-		};
-	}
-	else if (api_name == '/api_get_member/base_air_corps') {
-		// 基地航空隊一覧・状態取得.
-		func = function(json) {
-			if (json.api_data && Array.isArray(json.api_data)) {
-				if (!$air_base || !Array.isArray($air_base)) {
-					$air_base = [];
-				}
-				json.api_data.forEach(function(new_data) {
-					var found = false;
-					for (var i = 0; i < $air_base.length; i++) {
-						if ($air_base[i].api_area_id == new_data.api_area_id && $air_base[i].api_rid == new_data.api_rid) {
-							$air_base[i] = new_data;
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						$air_base.push(new_data);
-					}
-				});
-				save_storage('air_base', $air_base);
-				NotificationManager.syncAll();
-			}
-		};
-	}
-	else if (api_name == '/api_req_air_base/set_action') {
-		// 基地航空隊行動変更 (待機, 出撃, 防空, 退避, 休息).
-		var params = decode_postdata_params(request.request.postData.params);
-		var area_id = params.api_area_id;
-		var base_id = params.api_base_id || params.api_rid;
-		var action_kind = parseInt(params.api_action_kind, 10);
-		func = function(json) {
-			if ($air_base && Array.isArray($air_base) && area_id && base_id) {
-				for (var i = 0; i < $air_base.length; i++) {
-					if ($air_base[i].api_area_id == area_id && $air_base[i].api_rid == base_id) {
-						$air_base[i].api_action_kind = action_kind;
-						break;
-					}
-				}
-				save_storage('air_base', $air_base);
-				NotificationManager.syncAll();
-			}
-		};
-	}
-	else if (api_name == '/api_req_air_base/supply') {
-		// 基地航空隊補給.
-		var params = decode_postdata_params(request.request.postData.params);
-		var area_id = params.api_area_id;
-		var base_id = params.api_base_id || params.api_rid;
-		func = function(json) {
-			if ($air_base && Array.isArray($air_base) && area_id && base_id && json.api_data && json.api_data.api_plane_info) {
-				for (var i = 0; i < $air_base.length; i++) {
-					if ($air_base[i].api_area_id == area_id && $air_base[i].api_rid == base_id) {
-						$air_base[i].api_plane_info = json.api_data.api_plane_info;
-						break;
-					}
-				}
-				save_storage('air_base', $air_base);
-				NotificationManager.syncAll();
-			}
 		};
 	}
 	else if (api_name == '/api_req_map/select_eventmap_rank') {
