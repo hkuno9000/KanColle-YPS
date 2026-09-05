@@ -22,6 +22,192 @@ var $quest_clear	= load_quest_clear();
 var $logbook		= load_storage('logbook', []);
 var $quest_list		= load_storage('quest_list');
 var $air_base		= load_storage('air_base', []); // for noro6/kc-web
+
+var NotificationManager = {
+	enabled: false,
+	_cache: {},
+	_fleet_cond_timers: {},
+	init: function() {
+		var self = this;
+		if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+			chrome.storage.local.get('yps_notification_enabled', function(res) {
+				self.enabled = !!(res && res.yps_notification_enabled);
+				if (self.enabled) {
+					self.syncAll();
+				}
+			});
+			if (chrome.storage.onChanged) {
+				chrome.storage.onChanged.addListener(function(changes, area) {
+					if (area === 'local' && changes.yps_notification_enabled) {
+						self.enabled = !!changes.yps_notification_enabled.newValue;
+						if (self.enabled) {
+							self.syncAll();
+						} else {
+							self.clearAll();
+						}
+					}
+				});
+			}
+		}
+	},
+	setAlarm: function(name, when, title, message) {
+		if (!this.enabled) return;
+		if (when <= Date.now()) {
+			this.clearAlarm(name);
+			return;
+		}
+		var prev = this._cache[name];
+		if (prev && prev.when === when && prev.title === title && prev.message === message) {
+			return; // 変更なしのためスキップ
+		}
+		this._cache[name] = { when: when, title: title, message: message };
+		chrome.runtime.sendMessage({
+			alarm: {
+				action: 'set',
+				name: name,
+				when: when,
+				data: { title: title, message: message }
+			}
+		});
+	},
+	clearAlarm: function(name) {
+		if (this._cache[name]) {
+			delete this._cache[name];
+			chrome.runtime.sendMessage({
+				alarm: {
+					action: 'clear',
+					name: name
+				}
+			});
+		}
+	},
+	clearAll: function() {
+		for (var key in this._cache) {
+			chrome.runtime.sendMessage({
+				alarm: {
+					action: 'clear',
+					name: key
+				}
+			});
+		}
+		this._cache = {};
+		this._fleet_cond_timers = {};
+	},
+	syncAll: function() {
+		if (!this.enabled) return;
+		this.syncMissionsAndCond();
+		this.syncNdocks();
+	},
+	syncMissionsAndCond: function() {
+		if (!$fdeck_list) return;
+		var nowTime = ($pcDateTime ? $pcDateTime.getTime() : Date.now());
+		for (var f_id = 1; f_id <= 4; ++f_id) {
+			var deck = $fdeck_list[f_id];
+			if (!deck) {
+				delete this._fleet_cond_timers[f_id];
+				this.clearAlarm('mission_' + f_id);
+				this.clearAlarm('cond_' + f_id);
+				continue;
+			}
+			var mission_end = (deck.api_mission && deck.api_mission[2]) ? deck.api_mission[2] : 0;
+			if (mission_end > 0) {
+				var id = deck.api_mission[1];
+				var m_name = ($mst_mission && $mst_mission[id]) ? $mst_mission[id].api_name : ('遠征' + id);
+				var alarm_time = (mission_end - 60 * 1000 > nowTime) ? (mission_end - 60 * 1000) : mission_end;
+				this.setAlarm('mission_' + f_id, alarm_time, '遠征帰投', '第' + f_id + '艦隊（' + m_name + '）が遠征から帰投しました。');
+				delete this._fleet_cond_timers[f_id];
+				this.clearAlarm('cond_' + f_id);
+			} else {
+				this.clearAlarm('mission_' + f_id);
+				var is_sortie = false;
+				if ($battle_deck_id > 0) {
+					if (deck.api_id == $battle_deck_id) {
+						is_sortie = true;
+					} else if ($combined_flag && ($battle_deck_id == 1 || $battle_deck_id == 2) && (deck.api_id == 1 || deck.api_id == 2)) {
+						is_sortie = true;
+					}
+				}
+				if (is_sortie) {
+					delete this._fleet_cond_timers[f_id];
+					this.clearAlarm('cond_' + f_id);
+				} else {
+					var min_cond = 49;
+					if (deck.api_ship && $ship_list) {
+						for (var i = 0; i < deck.api_ship.length; ++i) {
+							var s_id = deck.api_ship[i];
+							if (!s_id || s_id == -1) continue;
+							if ($ndock_list && $ndock_list[s_id]) continue; // 入渠中の艦娘はcond回復判定から除外
+							var s = $ship_list[s_id];
+							if (s && s.c_cond < min_cond) {
+								min_cond = s.c_cond;
+							}
+						}
+					}
+					var ship_sig = (deck.api_ship || []).join(',');
+					if (min_cond < 49) {
+						var cached = this._fleet_cond_timers[f_id];
+						if (cached && cached.ship_sig !== ship_sig) {
+							delete this._fleet_cond_timers[f_id];
+							cached = null;
+						}
+
+						if (cached) {
+							if (min_cond < cached.min_cond) {
+								// 疲労悪化時は新しい目標時刻で再計算
+								var need_steps = Math.ceil((49 - min_cond) / 3);
+								var targetTime = nowTime + (need_steps * 3 * 60 * 1000);
+								this._fleet_cond_timers[f_id] = { ship_sig: ship_sig, min_cond: min_cond, when: targetTime, notified: false };
+								this.setAlarm('cond_' + f_id, targetTime, 'cond回復', '第' + f_id + '艦隊（' + deck.api_name + '）のcond値が回復しました。');
+							} else if (cached.when > nowTime) {
+								// 回復進行中または同一condでタイマー未満了：当初の目標時刻を維持（Timer Drift防止）
+								cached.min_cond = min_cond;
+								this.setAlarm('cond_' + f_id, cached.when, 'cond回復', '第' + f_id + '艦隊（' + deck.api_name + '）のcond値が回復しました。');
+							} else {
+								// 満了後かつ疲労悪化なし：ゴースト再セットを防止
+								cached.min_cond = min_cond;
+								cached.notified = true;
+								this.clearAlarm('cond_' + f_id);
+							}
+						} else {
+							// 新規または編成変更時
+							var need_steps = Math.ceil((49 - min_cond) / 3);
+							var targetTime = nowTime + (need_steps * 3 * 60 * 1000);
+							this._fleet_cond_timers[f_id] = { ship_sig: ship_sig, min_cond: min_cond, when: targetTime, notified: false };
+							this.setAlarm('cond_' + f_id, targetTime, 'cond回復', '第' + f_id + '艦隊（' + deck.api_name + '）のcond値が回復しました。');
+						}
+					} else {
+						delete this._fleet_cond_timers[f_id];
+						this.clearAlarm('cond_' + f_id);
+					}
+				}
+			}
+		}
+	},
+	syncNdocks: function() {
+		var active_docks = {};
+		var nowTime = ($pcDateTime ? $pcDateTime.getTime() : Date.now());
+		if ($ndock_list) {
+			for (var ship_id in $ndock_list) {
+				var d = $ndock_list[ship_id];
+				if (d && d.api_complete_time > 0 && d.api_id) {
+					active_docks[d.api_id] = d;
+				}
+			}
+		}
+		for (var dock_id = 1; dock_id <= 4; ++dock_id) {
+			var d = active_docks[dock_id];
+			if (d) {
+				var ship = ($ship_list && d.api_ship_id) ? $ship_list[d.api_ship_id] : null;
+				var ship_name_str = (ship && $mst_ship) ? ship_name(ship.ship_id) : '艦娘';
+				var alarm_time = (d.api_complete_time - 60 * 1000 > nowTime) ? (d.api_complete_time - 60 * 1000) : d.api_complete_time;
+				this.setAlarm('ndock_' + dock_id, alarm_time, '入渠完了', '第' + dock_id + 'ドック（' + ship_name_str + '）の入渠が完了しました。');
+			} else {
+				this.clearAlarm('ndock_' + dock_id);
+			}
+		}
+	}
+};
+NotificationManager.init();
 var $debug_battle_json = null;
 var $debug_ship_names = [];
 var $debug_api_name = '';
@@ -1409,7 +1595,7 @@ function map_rank_name(a) {
 
 function get_maparea_name(id) {
 	if (id >= 30) return "期間限定海域";	// 2018.12イベントでは, $mst_maparea[] にはイベント海域名のかわりにダミー文字列が入っている.
-	return $mst_maparea[id];
+	return ($mst_maparea && $mst_maparea[id]) ? $mst_maparea[id] : ('海域' + id);
 }
 
 function get_air_base_action_name(kind) {
@@ -2700,8 +2886,10 @@ function push_all_fleets(req) {
 			var ms = d.getTime() - $pcDateTime.getTime();
 			var rest = ms > 0 ? '残' + msec_name(ms) : '終了';
 			var id = deck.api_mission[1];
-			req.push('遠征' + $mst_mission[id].api_disp_no + ' ' + $mst_mission[id].api_name + ': ' + d.toLocaleString() + '(' + rest + ')');
-			$last_mission[f_id] = '前回遠征: 遠征' + $mst_mission[id].api_disp_no + ' ' + $mst_mission[id].api_name; // 支援遠征では /api_req_mission/result が来ないので、ここで事前更新しておく.
+			var m_name = ($mst_mission && $mst_mission[id]) ? $mst_mission[id].api_name : ('遠征' + id);
+			var m_disp = ($mst_mission && $mst_mission[id]) ? $mst_mission[id].api_disp_no : '';
+			req.push('遠征' + m_disp + ' ' + m_name + ': ' + d.toLocaleString() + '(' + rest + ')');
+			$last_mission[f_id] = '前回遠征: 遠征' + m_disp + ' ' + m_name; // 支援遠征では /api_req_mission/result が来ないので、ここで事前更新しておく.
 			$current_mission[f_id] = id;
 		}
 		else if (deck.api_id == $battle_deck_id) {
@@ -4467,6 +4655,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			var deck = json.api_data;
 			$fdeck_list[id] = deck;
 			update_fdeck_list($fdeck_list); // 編成結果を $ship_fdeck に反映する.
+			NotificationManager.syncAll();
 			print_port();
 		};
 	}
@@ -4474,6 +4663,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 連合艦隊編成・解除.
 		func = function(json) {
 			$combined_flag = decode_postdata_params(request.request.postData.params).api_combined_type;	// 0:解除, 1:機動部隊, 2:水上部隊, 3:輸送護衛部隊.
+			NotificationManager.syncAll();
 			print_port();
 		};
 	}
@@ -4516,6 +4706,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			}
 		}
 		update_fdeck_list($fdeck_list); // 編成結果を $ship_fdeck に反映する.
+		NotificationManager.syncAll();
 		print_port();
 	}
 	else if (api_name == '/api_req_hensei/lock') {
@@ -4647,6 +4838,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 入渠状況を更新する.
 			update_ndock_complete();
 			update_ndock_list(json.api_data);
+			NotificationManager.syncAll();
 			if ($do_print_port_on_ndock) {
 				$do_print_port_on_ndock = false;
 				print_port();
@@ -4668,6 +4860,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		inc_quest_progress(503); // 艦隊大整備！任務中: ５回なら任務状態を達成(3)に変更する.
 		if (params.api_highspeed != 0) {
 			ship.highspeed_repair();	// 母港パケットで一斉更新されるまで対象艦の修復完了が反映されないので、自前で反映する.
+			NotificationManager.syncAll();
 			print_port();	// 高速修復を使った場合は /api_get_member/ndock パケットが来ないので、ここで print_port() を行う.
 		}
 		else {
@@ -4685,6 +4878,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		var now = $material.now.concat();
 		--now[5];	// 高速修復材(バケツ).
 		update_material(now, $material.ndock);
+		NotificationManager.syncAll();
 		print_port();
 	}
 	else if (api_name == '/api_req_kousyou/createship_speedchange') {
@@ -4722,7 +4916,8 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				$wait_gimmick_interruption = 5; // API呼び出し5回分ギミック達成判定を追う
 				$event_object = json.api_data.api_event_object;
 			}
-			else {
+			NotificationManager.syncAll();
+			if (!$do_print_port_on_slot_item) {
 				print_port();
 			}
 		};
@@ -4740,6 +4935,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		func = function(json) { // 保有艦、艦隊一覧を更新してcond表示する.
 			delta_update_ship_list(json.api_data); // 間宮伊良湖では全艦、月間任務クリアで差分[1]のみ. スロット装備減少のみで保有艦の増減は無いので常に差分更新でOK.
 			update_fdeck_list(json.api_data_deck);
+			NotificationManager.syncAll();
 			print_port();
 		};
 	}
@@ -4752,6 +4948,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			else
 				update_ship_list(d.api_ship_data);
 			update_fdeck_list(d.api_deck_data);
+			NotificationManager.syncAll();
 			print_port();
 		};
 	}
@@ -4791,6 +4988,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		// 遠征出発.
 		func = function(json) { // 艦隊一覧を更新してcond表示する.
 			update_fdeck_list(json.api_data);
+			NotificationManager.syncAll();
 			print_port();
 		};
 	}
@@ -4926,6 +5124,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					air_base.push(planes);
 				});
 			}
+			NotificationManager.syncAll();
 			print_mapinfo(uncleared, air_base);
 		};
 	}
@@ -4958,6 +5157,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$is_boss = false;
 		make_debug_ship_names();
 		update_sortie_dn($battle_deck_id); if ($combined_flag) update_sortie_dn(2);
+		NotificationManager.syncAll();
 		func = on_next_cell;
 	}
 	else if (api_name == '/api_req_map/next') {
@@ -5040,6 +5240,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 		$battle_log = [];
 		make_debug_ship_names();
 		update_sortie_dn($battle_deck_id);
+		NotificationManager.syncAll();
 		func = on_battle;
 	}
 	else if (api_name == '/api_req_practice/midnight_battle') {
