@@ -1216,6 +1216,19 @@ function slotitem_sakuteki(id, lv) { // 装備の素索敵値と索敵スコア�
 	this.score33 = k * (raw + s);
 }
 
+function slotitem_reconnaissance(id, num) { // 装備の航空偵察スコアを返す ほぼ6-3専用
+	var item = $mst_slotitem[id];
+	// Cf. https://wikiwiki.jp/kancolle/%E4%B8%AD%E9%83%A8%E6%B5%B7%E5%9F%9F/6-3
+	switch(item.api_type[2]) {
+		case 10: // 水上偵察機
+		case 11: // 水上爆撃機 瑞雲等
+			return item.api_saku * Math.sqrt(Math.sqrt(num));
+		case 41: // 大型飛行艇 二式大艇・Catalina
+			return item.api_saku * Math.sqrt(num);
+	}
+	return 0;
+}
+
 function slotitem_names(idlist) {
 	if (!idlist) return '';
 	var names = [];
@@ -1725,6 +1738,7 @@ function fleet_brief_status(deck, deck2) {
 	var akashi = '';
 	var blank_slot_num = 0;
 	var slot_seiku = 0;
+	var reconnaissance = 0; // 航空偵察スコア
 	var list = deck.api_ship;
 	if (deck2) list = list.concat(deck2.api_ship);
 	for (var i in list) {
@@ -1747,8 +1761,13 @@ function fleet_brief_status(deck, deck2) {
 				drumcan.ships++;
 				drumcan.sum += d;
 			}
-			ship.slot.forEach(function(data) {
-				daihatu.count_up($slotitem_list[data]);
+			ship.slot.forEach(function(data, idx) {
+				var slotitem = $slotitem_list[data];
+				daihatu.count_up(slotitem);
+				if(slotitem) { // 装備あり
+					// 6-3 航空偵察スコア
+					reconnaissance += slotitem_reconnaissance(slotitem.item_id, ship.onslot[idx]);
+				}
 			});
 			blank_slot_num += ship.blank_slot_num();
 			slot_seiku     += ship.slot_seiku();
@@ -1779,6 +1798,7 @@ function fleet_brief_status(deck, deck2) {
 		+ (sakuteki.score > 0 ? ' 索敵スコア' + sakuteki.msg : '')
 		+ (blank_slot_num ? ' 空スロット' + blank_slot_num : '')
 		+ akashi
+		+ (/6-3/.test(deck.api_name) ? ' 航空偵察スコア' + reconnaissance.toFixed(2) : '')
 		;
 	return ret.trim();
 }
