@@ -308,6 +308,39 @@ function copy_button() {
 		;
 }
 
+var $notification_enabled = false;
+chrome.storage.local.get('yps_notification_enabled', function(res) {
+	if (res && typeof res.yps_notification_enabled === 'boolean') {
+		$notification_enabled = res.yps_notification_enabled;
+	}
+	var btn = document.getElementById('YPS_notification');
+	if (btn) {
+		btn.value = $notification_enabled ? '通知: ON' : '通知: OFF';
+	}
+});
+
+if (chrome.storage.onChanged) {
+	chrome.storage.onChanged.addListener(function(changes, area) {
+		if (area === 'local' && changes.yps_notification_enabled) {
+			$notification_enabled = !!changes.yps_notification_enabled.newValue;
+			var btn = document.getElementById('YPS_notification');
+			if (btn) {
+				btn.value = $notification_enabled ? '通知: ON' : '通知: OFF';
+			}
+		}
+	});
+}
+
+function notification_button() {
+	$button_onclick["YPS_notification"] = function() {
+		$notification_enabled = !$notification_enabled;
+		this.value = $notification_enabled ? '通知: ON' : '通知: OFF';
+		chrome.storage.local.set({ 'yps_notification_enabled': $notification_enabled });
+	};
+	var label = $notification_enabled ? '通知: ON' : '通知: OFF';
+	return ' <input id="YPS_notification" type="button" value="' + label + '"/>';
+}
+
 function version_banner() {
 	return ' <a href="' + home_url + '" target="KanColle-YPS-website" id="YPS_go_help">KanColle-YPS ' + ver_name + '</a>';
 }
@@ -319,7 +352,9 @@ chrome.runtime.onMessage.addListener(function (req) {
 	if (!div.parentNode) document.body.replaceChild(div, hst); // 履歴表示を中断する.
 	if (req instanceof Array) {
 		div.innerHTML = parse_markdown(req);
-		navi.innerHTML = all_close_button() + history_buttons() + version_banner() + "<br/>" + copy_button();
+		navi.innerHTML = all_close_button() + history_buttons() + version_banner() + "<br/>"
+			+ copy_button() + "<br/>"
+			+ notification_button();
 	}
 	else if (req.appendData) {
 		pop_history();

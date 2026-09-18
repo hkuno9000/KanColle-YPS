@@ -4,7 +4,7 @@
 .yps-body {
 	white-space: pre-wrap;
 	position: absolute;
-	top: 64px; /* game-header 40px + margin 20px */
+	top: 88px; /* game-header 40px + margin 20px + navi-3lines */
 	left: 1298px; /* game-header 1280px + padding 10px + margin 8px */
 }
 .yps-history {
@@ -13,6 +13,10 @@
 .yps-navi {
 	white-space: nowrap;
 	top: 8px; /* margin 8px */
+}
+#YPS_notification {
+	width: 80px;
+	text-align: center;
 }
 .yps-cliptext {
 	position: fixed;
