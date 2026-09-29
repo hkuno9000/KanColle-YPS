@@ -2599,8 +2599,8 @@ function print_remodel_slotlist(list) {
 		msg += '/'  + data.api_req_steel;
 		msg += '/'  + data.api_req_bauxite;
 		msg += '\t' + remodel_req_kits_name(data)         + remodel_req_slot_name(data);
-		msg += '\t' + remodel_req_kits_name(data.my_lv6)  + remodel_req_slot_name(data.my_lv6);
-		msg += '\t' + remodel_req_kits_name(data.my_lv10) + remodel_req_slot_name(data.my_lv10);
+		msg += '\t|'+ remodel_req_kits_and_slot_lv6to9(data);
+		msg += '\t' + remodel_req_kits_name(data.my_lv10) + remodel_req_slot_name(data.my_lv10) + remodel_req_slot_name2(data.my_lv10) + remodel_req_useitem_name(data.my_lv10) + remodel_req_useitem_name2(data.my_lv10);
 		req.push(msg);
 	});
 	chrome.runtime.sendMessage(req);
@@ -2615,6 +2615,40 @@ function remodel_req_kits_name(data) {
 function remodel_req_slot_name(data) {
 	if (!data || !data.api_req_slot_num) return '';
 	return '/' + slotitem_name(data.api_req_slot_id) + 'x' + data.api_req_slot_num;
+}
+function remodel_req_slot_name2(data) {
+	if (!data || !data.api_req_slot_num2) return '';
+	return '/' + slotitem_name(data.api_req_slot_id2) + 'x' + data.api_req_slot_num2;
+}
+function remodel_req_useitem_name(data) {
+	if (!data || !data.api_req_useitem_num) return '';
+	return '/' + useitem_name(data.api_req_useitem_id) + 'x' + data.api_req_useitem_num;
+}
+function remodel_req_useitem_name2(data) {
+	if (!data || !data.api_req_useitem_num2) return '';
+	return '/' + useitem_name(data.api_req_useitem_id2) + 'x' + data.api_req_useitem_num2;
+}
+function remodel_req_kits_and_slot_lv6to9(data) { // my_lv6 my_lv7 my_lv8 my_lv9 をまとめて処理
+	if(!data) return '';
+	var msg = '';
+	for(let idx = 6; idx < 10; ++idx) {
+		const key = 'my_lv' + idx;
+		if(!data[key]) continue;
+		const d = data[key];
+		if(!msg) {
+			msg = remodel_req_kits_name(d) + remodel_req_slot_name(d);
+		}
+		if(d.api_req_slot_num2 || d.api_req_useitem_num || d.api_req_useitem_num2) {
+			msg += '\n(★' + idx +')' + remodel_req_slot_name2(d) + remodel_req_useitem_name(d) + remodel_req_useitem_name2(d);
+		}
+	}
+	return msg;
+}
+
+function useitem_name(id) {
+	var item = $mst_useitem[id];
+	if (!item) return to_string(id);	// unknown useitem.
+	return item.api_name;
 }
 
 function slotitem_levellist(mstid) {
@@ -4614,8 +4648,12 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			list.forEach(function(data) {
 				var id = data.api_id; // レシピID.
 				var prev = $remodel_slotlist[id];
+				// ☆6以上から2種類目の装備消費があるパターン(api_req_slot_id2)・装備以外のアイテムを消費するパターン(api_req_useitem_id, api_req_useitem_id2)が存在する
 				if (prev) {
 					if (prev.my_lv10)          data.my_lv10 = prev.my_lv10;
+					if (prev.my_lv9)           data.my_lv9  = prev.my_lv9;
+					if (prev.my_lv8)           data.my_lv8  = prev.my_lv8;
+					if (prev.my_lv7)           data.my_lv7  = prev.my_lv7;
 					if (prev.my_lv6)           data.my_lv6  = prev.my_lv6;
 					if (prev.api_req_slot_id)  data.api_req_slot_id  = prev.api_req_slot_id;
 					if (prev.api_req_slot_num) data.api_req_slot_num = prev.api_req_slot_num;
@@ -4639,7 +4677,9 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 			var data = $remodel_slotlist[params.api_id];
 			if (data.api_req_remodelkit == null) return;
 			if (item.level >= 10)    data.my_lv10 = d;
-			else if (item.level >= 6) data.my_lv6 = d;
+			else if (item.level >= 6) {
+				data['my_lv' + item.level] = d; // my_lv6 my_lv7 my_lv8 my_lv9
+			}
 			else if (d.api_req_slot_num) {
 				data.api_req_slot_id  = d.api_req_slot_id;
 				data.api_req_slot_num = d.api_req_slot_num;
