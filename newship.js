@@ -291,6 +291,7 @@ $init_newship_slots = {
 925:	2,	// Langley.
 927:	2,	// Valiant.
 931:	3,	// Ranger.
+932:  2,  // Indiana.
 933:	2,	// Massachusetts.
 934:	0,	// C.Cappellini.
 935:	1,	// Jean Bart.
@@ -307,12 +308,29 @@ $init_newship_slots = {
 966:	3,	// Lexington.
 971:	0,	// 伊36.
 972:	0,	// 伊41.
+973:  2,  // Thonburi.
 984:	0,	// Wahoo.
+985:  0,  // Dace = Leonardo da Vinci.
+988:  0,  // 南海 = 野埼.
+991:  1,  // Reno.
 992:	1,	// 杉.
+993:  1,  // 樫.
 994:	1,	// 榧.
 995:	2,	// 大泊.
+998:  2,  // Norge.
+999:  2,  // Eidsvold.
 1001:	3,	// Киров.
 1003:	2,	// しまね丸.
 1005:	1,	// Minneapolis.
+1022:	2,	// Glorious.
+1023:	2,	// Independence.
+1025:	3,	// Wasp.
+1041:	3,	// 花月.
+1044:	1,	// 桐.
+1051:	3,	// Algérie.
+1053:	2,	// Vautour.
+1055:	2,	// Béarn.
+1062:	1,	// Visby.
+1065:	2,	// 日枝丸.
 9999:	null	// dummy
 };
