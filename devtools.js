@@ -3370,7 +3370,11 @@ function on_next_cell(json) {
 			$material.dropitem[id-1]   += count;	// 道中ドロップによる資材増加を記録する.
 			$material.autosupply[id-1] -= count;	// 後続の /api_port/port にて自然増加に誤算入される分を補正する.
 			msg += (i == 0 ? ':' : ', ') + material_name(id) + 'x' + count;
-			if (d.api_event_id == 7) msg += "(航空偵察)";	// 航空偵察マスの資源はboss戦勝利により獲得が確定する.　獲得失敗時は自然増加の減少として扱う.
+			if (d.api_event_id == 7) {
+				const result = d.api_airsearch.api_result;
+				const success = result == 2 ? '大成功' : (result == 1 ? '成功' : '失敗'); // 失敗(result=0)時は 航空偵察失敗 の経路となりここでは成立しないが一応
+				msg += "(航空偵察:" + success + ")";	// 航空偵察マスの資源はboss戦勝利により獲得が確定する.　獲得失敗時は自然増加の減少として扱う.
+			}
 		}
 		$battle_log.push(msg);
 		print_next('next item' + boss_next_name(), msg);
