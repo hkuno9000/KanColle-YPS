@@ -2639,7 +2639,8 @@ function remodel_req_kits_and_slot_lv6to9(data) { // my_lv6 my_lv7 my_lv8 my_lv9
 			msg = remodel_req_kits_name(d) + remodel_req_slot_name(d);
 		}
 		if(d.api_req_slot_num2 || d.api_req_useitem_num || d.api_req_useitem_num2) {
-			msg += '\\n(★' + idx +')' + remodel_req_slot_name2(d) + remodel_req_useitem_name(d) + remodel_req_useitem_name2(d);
+			const _msg = remodel_req_slot_name2(d) + remodel_req_useitem_name(d) + remodel_req_useitem_name2(d);
+			msg += '\\n(★' + idx +')' + _msg.substring(1); // 先頭の / だけ除去
 		}
 	}
 	return msg;
