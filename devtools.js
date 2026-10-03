@@ -2572,6 +2572,7 @@ function print_remodel_slotlist(list) {
 		+'\t==開発/改修/消費装備'
 		+'\t==★+6開発/改修/消費装備'
 		+'\t==★max開発/改修/消費装備'
+		+'\t==改修更新先(上位装備)'
 	];
 	var list_ids = Object.keys(list);
 	list_ids.sort(function(a, b) {	// 改修レシピID配列を装備分類順に並べ替える.
@@ -2601,6 +2602,7 @@ function print_remodel_slotlist(list) {
 		msg += '\t' + remodel_req_kits_name(data)         + remodel_req_slot_name(data);
 		msg += '\t|'+ remodel_req_kits_and_slot_lv6to9(data);
 		msg += '\t' + remodel_req_kits_name(data.my_lv10) + remodel_req_slot_name(data.my_lv10) + remodel_req_slot_name2(data.my_lv10) + remodel_req_useitem_name(data.my_lv10) + remodel_req_useitem_name2(data.my_lv10);
+		msg += '\t' + remodel_upgrade(data.my_upgrade);
 		req.push(msg);
 	});
 	chrome.runtime.sendMessage(req);
@@ -2644,6 +2646,11 @@ function remodel_req_kits_and_slot_lv6to9(data) { // my_lv6 my_lv7 my_lv8 my_lv9
 		}
 	}
 	return msg;
+}
+function remodel_upgrade(data) {
+	if(!data || !data.api_change_flag) return '';
+	if(data.api_remodel_id) return slotitem_name(data.api_remodel_id);
+	return '(更新先アリ)';
 }
 
 function useitem_name(id) {
@@ -4662,6 +4669,7 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 					if (prev.my_lv6)           data.my_lv6  = prev.my_lv6;
 					if (prev.api_req_slot_id)  data.api_req_slot_id  = prev.api_req_slot_id;
 					if (prev.api_req_slot_num) data.api_req_slot_num = prev.api_req_slot_num;
+					if (prev.my_upgrade)       data.my_upgrade = prev.my_upgrade;
 				}
 				$remodel_slotlist[id] = data;
 				$remodel_slot_today[id] = subship_id;
@@ -4689,6 +4697,11 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 				data.api_req_slot_id  = d.api_req_slot_id;
 				data.api_req_slot_num = d.api_req_slot_num;
 			}
+			if(!data.my_upgrade) {
+				data.my_upgrade = { api_change_flag: d.api_change_flag };
+			} else if(d.api_change_flag) {
+				data.my_upgrade.api_change_flag = d.api_change_flag;
+			}
 			save_storage('remodel_slotlist', $remodel_slotlist);
 			save_storage('remodel_slotweek', $remodel_slotweek);
 			// print remodel list on today.
@@ -4698,10 +4711,18 @@ chrome.devtools.network.onRequestFinished.addListener(function (request) {
 	else if (api_name == '/api_req_kousyou/remodel_slot') {
 		// 装備改修結果.
 		func = function(json) {	// 明石の改修工廠で改修した装備をリストに反映する.
+			var params = decode_postdata_params(request.request.postData.params);
+			var data = $remodel_slotlist[params.api_id];
 			var d = json.api_data;
 			add_slotitem_list(d.api_after_slot);	// 装備リストを更新する.
 			slotitem_delete(d.api_use_slot_id);		// 改修で消費した装備を装備リストから抜く.
 			update_material(d.api_after_material, $material.remodelslot);	/// 改修による資材消費を記録する.
+			// api_remodel_id に改修更新先情報 [改修元, 改修先]
+			if(d.api_remodel_id && d.api_remodel_id[0] != d.api_remodel_id[1]) {
+				data.my_upgrade.api_remodel_id = d.api_remodel_id[1];
+				save_storage('remodel_slotlist', $remodel_slotlist);
+				save_storage('remodel_slotweek', $remodel_slotweek);
+			}
 			print_remodel_slotlist($remodel_slot_today);
 		};
 	}
