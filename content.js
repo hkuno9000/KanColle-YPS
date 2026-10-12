@@ -188,7 +188,7 @@ function parse_markdown(a) {
 		else if (/^\t/.test(s))		{ t = '<tr>' + s.replace(/\t/g, '</td><td>') + '</tr>'; tr_count++;
 									  t = t.replace(/<tr><\/td>/, '<tr>');
 									  t = t.replace(/<td>\|(.*?)(?=<td|<\/tr)/g, function(match, p1) {	// "\t|" は :,で折り返し有とする. \n で確定の折り返しも許す.
-										return '<td>' + p1.replace(/[,:] /g, '$&<wbr>').replace(/\n/g, '<br>');
+										return '<td>' + p1.replace(/[,:] /g, '$&<wbr>').replace(/\\n/g, '<br>');
 									  });
 									  t = t.replace(/<td>  /g, '<td style="text-align:right;">'); // "\t  " は右寄せする.
 									  t = t.replace(/<td>~~/g, '<td colspan="99">'); // "\t~~" は以後のセルを結合する.
